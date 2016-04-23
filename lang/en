@@ -1,0 +1,18 @@
+title = Certification verification;
+header = Certification verification;
+
+cert_err = File not uploaded;
+cert_not_verified = Not verified;
+cert_not_found = Sign not found;
+cert_verified = Verified;
+
+
+choose_file = Choose file;
+submit_button_text = Check;
+
+cert_info_title = Info;
+cert_info_date = Date;
+cert_info_city = City;
+cert_info_organization = Organization;
+cert_info_position = Position;
+cert_info_fio = FIO;

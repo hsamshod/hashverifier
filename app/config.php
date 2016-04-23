@@ -149,6 +149,9 @@
 
     if (isset($_GET['lang']) && in_array($_GET['lang'], $langs)) {
         $lang = $_GET['lang'];
+        setcookie('lang', $lang);
+    } elseif (isset($_COOKIE['lang']) && in_array($_COOKIE['lang'], $langs)) {
+        $lang = $_COOKIE['lang'];
     } else {
         $lang = $default_lang;
     }
