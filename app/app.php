@@ -1,6 +1,12 @@
-<?php 
+<?php
+	foreach (['config', 'utils', 'db'] as $file) {
+		include dirname(__FILE__).'/'.$file.'.php';
+	}
+
 	/**
-	 * @param $url  	File adress to get.
+	 * @param string $url  	File adress to get.
+	 *
+	 * @return string 		File content
 	 */
 	function getFile($url) {
 		$opts = [
@@ -16,9 +22,11 @@
 	}
 	
 	/**
-	 * @param $url  	Address of file sign of to get.
+	 * @param string $url  	 Address of file sign of to get.
+	 *
+	 * @return array 		 File in array form.
 	 */
-	function getFileSign($url = false) {
+	function getFileSign($url) {
 		$file_as_string = getFile($url.SIGN_EXT);
 		$file_as_array = false;
 		if ($file_as_string) {
@@ -28,40 +36,34 @@
 	}
 
 	/**
-	 * Get pair of open keys.
-	 * @user
+	 * @param resource $db			DB handle.
+	 * @param int $verifier_id		Verifier id.
+	 *
+	 * @return array|false			Verifier data.
 	 */
-	function initDB() {
-		try {
-		    return new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASS);
-		} catch (PDOException $e) {
-		    print 'smth went wrong!';
-		    die();
-		}
-	}
-
-	function closeDB($db) {
-		$db = null;
-	}
-
 	function getKeys($db, $verifier_id) {
 		$sql =  'select key1, key2 from '.DB_KEYS_TABLE.' '.
 				'where userid = :verifier_id and cert_ending > now() and status in (:statuses) '.
 				'limit 1';
-		$sth = $db->prepare($sql);
-		$sth->execute([
-			':verifier_id' => $verifier_id, 
+		$sth = Database::getInstance()->exec($sql, [
+			':verifier_id' => $verifier_id,
 			':statuses' => implode(',', CERT_ALLOWED_STATUSES)
 		]);
-		return $sth->fetch();
+
+		if ($sth->num_rows) {
+			return $sth->fetch();
+		}
+		return false;
 	}
 
+	/**
+	 * fucked up writing docs.
+	 */
 	function getVerifierData($db, $verifier_id) {
 		$sql =  'select * from '.DB_CERT_TABLE.' '.
 				'where cid = :verifier_id '.
 				'limit 1';
-		$sth = $db->prepare($sql);
-		$sth->execute([
+		$sth = Database::getInstance()->exec($sql, [
 			':verifier_id' => $verifier_id 
 		]);
 		return $sth->fetch();
@@ -108,10 +110,13 @@
 				$result = $DS->verifDS($hash, $sign, $Q);
 
 				if ($result == VERIFY_OK) {
-	                return getVerifierData($db, $verifier_id);
+                    $return = getVerifierData($db, $verifier_id);
 	            } else {
-	                return VERIFY_ERR;
+                    $return = VERIFY_ERR;
 	            }
+                closeDB($db);
+
+                return $return;
             }
 		}
 	}
