@@ -1,17 +1,12 @@
 <?php
     session_start();
     ini_set('max_execution_time', 300);
-    ini_set( 'default_charset', 'UTF-8' );
+    ini_set('default_charset', 'UTF-8');
 
     function __autoload($class_name) {
         include 'classes/'.$class_name.'.php';
     }
 
-    const VIEWS_FOLDER = 'view/';
-    const LANG_STORAGE = 'lang/';
-
-    const SIGN_STORAGE = 'sign/';
-    const FILE_STORAGE = 'files/';
     const SIGN_EXT     = '.sig';
 
     const VERIFY_PARAM_ERR      = -5;

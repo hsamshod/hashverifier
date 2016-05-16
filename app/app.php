@@ -1,49 +1,4 @@
 <?php 
-	function getPublicKey() {
-		return file('keys/public.key');
-	}
-	function getSign($fileName = false) {
-		if ($fileName) {
-			$fullPath = SIGN_STORAGE.$fileName.SIGN_EXT;
-			if(file_exists($fullPath)) {
-				return file_get_contents($fullPath);
-			}
-		}
-		return false;
-	}
-	function getUploadedFile($fileName = false) {
-		if ($fileName) {
-			$fullPath = FILE_STORAGE.$fileName;
-			if(file_exists($fullPath)) {
-				$file = file_get_contents($fullPath);
-                deleteUpload($fullPath);
-                return $file;
-            }
-		}
-		return false;
-	}
-	function deleteUpload($fileName) {
-		unlink($fileName);
-	}
-	function processPostData() {
-		$f = $_FILES['file'];
-		if ($f['error'] == 0) {
-	        $tmp_name = $f['tmp_name'];
-	        $name = $f['name'];
-	        if (move_uploaded_file($tmp_name, FILE_STORAGE.$name)) {
-	        	return $name;
-	        }
-	    }
-		return false;
-	}
-	function view($fileName = '', $data = []) {
-        global $l;
-		extract($data);
-        if ($fileName && file_exists(VIEWS_FOLDER.$fileName.'.php')) {
-            include VIEWS_FOLDER.$fileName.'.php';
-        }
-    }
-
 	/**
 	 * @param $url  	File adress to get.
 	 */
