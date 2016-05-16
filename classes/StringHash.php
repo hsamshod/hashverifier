@@ -22,7 +22,7 @@
 
         public $outLen = 0;
 
-        function __construct(int $outputLength) {
+        function __construct($outputLength) {
             global $A, $Sbox, $Tau, $C;
 
             $this->A = $A;
@@ -197,11 +197,11 @@
             }
         }
 
-        public function GetSHA512Hash($message) : String {
+        public function GetSHA512Hash($message) {
             return hash('SHA512', $message);
         }
 
-        public function GetGostHash($message) : String {
+        public function GetGostHash($message) {
             return hash('gost-crypto', $message);
         }
     }

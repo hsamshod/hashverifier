@@ -1,6 +1,7 @@
 <?php
     session_start();
     ini_set('max_execution_time', 300);
+    ini_set( 'default_charset', 'UTF-8' );
 
     function __autoload($class_name) {
         include 'classes/'.$class_name.'.php';
@@ -11,12 +12,24 @@
 
     const SIGN_STORAGE = 'sign/';
     const FILE_STORAGE = 'files/';
-    const SIGN_EXT     = '.sign';
+    const SIGN_EXT     = '.sig';
 
-    const VERIFY_SIGN_ERR  = -2;
-    const VERIFY_FILE_ERR  = -1;
-    const VERIFY_ERR       =  1;
-    const VERIFY_OK        =  0;
+    const VERIFY_PARAM_ERR      = -5;
+    const VERIFY_FILE_ERR       = -4;
+    const VERIFY_SIGN_ERR       = -3;
+    const VERIFY_KEY_ERR        = -2;
+    const VERIFY_ERR            = -1;
+    const VERIFY_OK             =  0;
+
+    const DB_HOST   = 'host';
+    const DB_USER   = 'root';
+    const DB_PASS   = '';
+    const DB_NAME   = 'db';
+
+    const DB_KEYS_TABLE  = 'cert';
+    const DB_CERT_TABLE  = 'certificate';
+    
+    const CERT_ALLOWED_STATUSES = [1]; // min 1 elem
 
     $A = [
         gmp_init('0x8e20faa72ba0b470'), gmp_init('0x47107ddd9b505a38'), gmp_init('0xad08b0e0c3282d1c'), gmp_init('0xd8045870ef14980e'),
@@ -143,16 +156,3 @@
     ];
 
     $maxLength = 70;
-
-    $langs = ['ru', 'en'];
-    $default_lang = 'ru';
-
-    if (isset($_GET['lang']) && in_array($_GET['lang'], $langs)) {
-        $lang = $_GET['lang'];
-        setcookie('lang', $lang);
-    } elseif (isset($_COOKIE['lang']) && in_array($_COOKIE['lang'], $langs)) {
-        $lang = $_COOKIE['lang'];
-    } else {
-        $lang = $default_lang;
-    }
-    $l = parse_ini_file(LANG_STORAGE.$lang);

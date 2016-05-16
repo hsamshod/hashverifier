@@ -8,7 +8,7 @@
      * @param int $b_start      destination array paste position.
      * @param int $elem_cnt     quantity of elems to be copied.
      */
-    function array_copy (array $a, int $a_start, array &$b, int $b_start, int $elem_cnt) {
+    function array_copy ($a, $a_start, &$b, $b_start, $elem_cnt) {
         for ($i = 0; $i < $elem_cnt; $i++, $a_start++, $b_start++) {
             $b[$b_start] = $a[$a_start];
         }
@@ -21,7 +21,7 @@
      * @param array $b          destination array passes (by reference).
      * @param int $elem_cnt     quantity of elems to be copied.
      */
-    function array_copy_n (array $a, array &$b, int $elem_cnt) {
+    function array_copy_n ($a, &$b, $elem_cnt) {
         $a_start = 0;
         $b_start = 0;
         for ($i = 0; $i < $elem_cnt; $i++, $a_start++, $b_start++) {
@@ -35,7 +35,7 @@
      * @param array $elems      input array.
      * @return array            bits of elems of input array.
      */
-    function bit_array (array $elems = []) : array {
+    function bit_array ($elems = []) {
         $return = [];
         /* @var int $elem */
         foreach ($elems as $elem) {
@@ -52,7 +52,7 @@
      * @param string $key       Key of flash.
      * @param mixed $msg        Value of flssh.
      */
-    function setFlash (string $key, $msg) {
+    function setFlash ($key, $msg) {
         $_SESSION[$key] = $msg;
     }
 
@@ -63,7 +63,7 @@
      * @param string $key   Key of flash.
      * @return bool         whether flash is set.
      */
-    function hasFlash (string $key) : bool {
+    function hasFlash ($key) {
         return isset($_SESSION[$key]);
     }
 
@@ -73,7 +73,7 @@
      * @param string $key       Key of flash.
      * @return mixed|null       Value of flash.
      */
-    function getFlash (string $key) {
+    function getFlash ($key) {
         $val = null;
         if (isset($_SESSION[$key])) {
             $val = $_SESSION[$key];
@@ -87,7 +87,7 @@
      *
      * @param string $location      Address to redirect.
      */
-    function redirect (string $location) {
+    function redirect ($location) {
         header('Location:'.$location);
         exit();
     }
