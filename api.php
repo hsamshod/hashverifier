@@ -19,6 +19,10 @@
 //        return Database::getInstance()->query('select * from cert');
 //    }
 
+    function checkToken () {
+        return true;
+    }
+
     if (isset($_POST['action']) && checkToken()) {
         $action = $_POST['action'];
 

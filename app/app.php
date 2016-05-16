@@ -8,7 +8,7 @@
 	 *
 	 * @return string 		File content
 	 */
-	function getFile($url) {
+	function getFile ($url) {
 		$opts = [
 			'http' => [
 				'method'  =>  'GET',
@@ -26,7 +26,7 @@
 	 *
 	 * @return array 		 File in array form.
 	 */
-	function getFileSign($url) {
+	function getFileSign ($url) {
 		$file_as_string = getFile($url.SIGN_EXT);
 		$file_as_array = false;
 		if ($file_as_string) {
@@ -41,7 +41,7 @@
 	 *
 	 * @return array|false			Verifier data.
 	 */
-	function getKeys($db, $verifier_id) {
+	function getKeys ($verifier_id) {
 		$sql =  'select key1, key2 from '.DB_KEYS_TABLE.' '.
 				'where userid = :verifier_id and cert_ending > now() and status in (:statuses) '.
 				'limit 1';
@@ -59,7 +59,7 @@
 	/**
 	 * fucked up writing docs.
 	 */
-	function getVerifierData($db, $verifier_id) {
+	function getVerifierData ($verifier_id) {
 		$sql =  'select * from '.DB_CERT_TABLE.' '.
 				'where cid = :verifier_id '.
 				'limit 1';
@@ -69,7 +69,7 @@
 		return $sth->fetch();
 	}
 
-	function verify() {
+	function verify () {
 		$url = urldecode($_SERVER['QUERY_STRING']);
 		if (!filter_var($url, FILTER_VALIDATE_URL)) {
 			return VERIFY_PARAM_ERR; 
