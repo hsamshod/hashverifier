@@ -11,7 +11,7 @@
                'from cert c '.
                'join user_data ud on c.userid = ud.userid '.
                'where c.status = :status';
-        return DB::query($sql, [':status' => 5])->fetchAll();
+        return DB::query($sql, $params)->fetchAll();
     }
 
     function updateKeys ($params = []) {
