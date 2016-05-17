@@ -45,7 +45,7 @@
 		$sql =  'select key1, key2 from '.DB_KEYS_TABLE.' '.
 				'where userid = :verifier_id and cert_ending > now() and status in (:statuses) '.
 				'limit 1';
-		$sth = Database::getInstance()->exec($sql, [
+		$sth = DB::exec($sql, [
 			':verifier_id' => $verifier_id,
 			':statuses' => implode(',', CERT_ALLOWED_STATUSES)
 		]);
@@ -63,7 +63,7 @@
 		$sql =  'select * from '.DB_CERT_TABLE.' '.
 				'where cid = :verifier_id '.
 				'limit 1';
-		$sth = Database::getInstance()->exec($sql, [
+		$sth = DB::exec($sql, [
 			':verifier_id' => $verifier_id 
 		]);
 		return $sth->fetch();
@@ -91,14 +91,12 @@
 			if(!$data = getFileSign($url)) {
                 return VERIFY_SIGN_ERR;
             } else {
-            	$db = initDB();
-            	
             	list($sign, $verifier_id) = $data;
             	if (!($sign && $verifier_id)) {
                 	return VERIFY_SIGN_ERR;
             	}
 				
-				list($x, $y) = getKeys($db);
+				list($x, $y) = getKeys($verifier_id);
 				if (!($x && $y)) {
                 	return VERIFY_KEY_ERR;
 				}
@@ -110,11 +108,10 @@
 				$result = $DS->verifDS($hash, $sign, $Q);
 
 				if ($result == VERIFY_OK) {
-                    $return = getVerifierData($db, $verifier_id);
+                    $return = getVerifierData($verifier_id);
 	            } else {
                     $return = VERIFY_ERR;
 	            }
-                closeDB($db);
 
                 return $return;
             }

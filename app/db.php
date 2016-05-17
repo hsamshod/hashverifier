@@ -1,5 +1,5 @@
 <?php
-    class Database
+    class DB
     {
         private $_db;
         static $_instance;
@@ -23,13 +23,19 @@
             return self::$_instance;
         }
 
-        public function query($sql) {
-            return $this->_db->query($sql);
-        }
-
-        public function exec($sql, $params = []) {
-            $sth = $this->_db->prepare($sql);
-            return $sth->execute($params);
+        public static function query($sql, $params = []) {
+            try {
+                $sth = self::getInstance()->_db->prepare($sql);
+                $sth->execute($params);
+                return $sth;
+            } catch (PDOException $e) {
+                file_put_contents(
+                    time().'.log',
+                    "sql: ".var_export($sql, 1).
+                    "\nparams: ".var_export($params,1).
+                    "\nmessage: ".$e->getMessage()
+                );
+            }
         }
 
     }
