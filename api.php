@@ -11,14 +11,21 @@
                'from cert c '.
                'join user_data ud on c.userid = ud.userid '.
                'where c.status = :status';
-        return DB::query($sql, $params)->fetchAll();
+        $result = DB::query($sql, $params);
+
+        if ($result) {
+            return $result->fetchAll();
+        } else {
+            return $result;
+        }
     }
 
     function updateKeys ($params = []) {
         $sql = 'update cert c '.
                'set c.cert = :cert, c.key1 = :key1, c.key2 = :key2, c.status = :status '.
                'where c.userid = :userid';
-        return DB::query($sql, $params);
+        
+        return DB::query($sql, $params) ? 'ok' : 'error';
     }
 
     function checkToken () {
