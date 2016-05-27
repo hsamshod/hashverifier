@@ -11,7 +11,7 @@
                       'ud.postindex, ud.country_id, ud.region_id,'.
                       'ud.node_id, ud.city_id, ud.street_id, ud.house,'.
                       'ud.korp, ud.str, ud.edu_email, ud.edu_phone,'.
-                      'ud.edu_boss, ud.edu_desc, ud.inn_kpp '.
+                      'ud.edu_boss, ud.edu_name, ud.inn_kpp '.
                'from cert c '.
                'join user_data ud on c.userid = ud.userid '.
                'where c.status = :status';
