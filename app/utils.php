@@ -91,3 +91,14 @@
         header('Location:'.$location);
         exit();
     }
+
+    /**
+     * Dump and die.
+     * @param mixed $var    Var to dump.
+     */
+    function dd($var = []) {
+        if (!is_array($var) || is_array($var) && !empty($var)) {
+            var_dump($var);
+        }
+        die();
+    }

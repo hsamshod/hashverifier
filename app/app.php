@@ -42,10 +42,10 @@
 	 * @return array|false			Verifier data.
 	 */
 	function getKeys ($verifier_id) {
-		$sql =  'select key1, key2 from '.DB_KEYS_TABLE.' '.
+		$sql =  'select key1, key2 from '.CERT_DB_KEYS_TABLE.' '.
 				'where userid = :verifier_id and cert_ending > now() and status in (:statuses) '.
 				'limit 1';
-		$sth = DB::exec($sql, [
+		$sth = CERT_DB::exec($sql, [
 			':verifier_id' => $verifier_id,
 			':statuses' => implode(',', CERT_ALLOWED_STATUSES)
 		]);
@@ -60,10 +60,10 @@
 	 * fucked up writing docs.
 	 */
 	function getVerifierData ($verifier_id) {
-		$sql =  'select * from '.DB_CERT_TABLE.' '.
+		$sql =  'select * from '.CERT_DB_CERT_TABLE.' '.
 				'where cid = :verifier_id '.
 				'limit 1';
-		$sth = DB::exec($sql, [
+		$sth = CERT_DB::exec($sql, [
 			':verifier_id' => $verifier_id 
 		]);
 		return $sth->fetch();

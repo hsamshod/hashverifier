@@ -1,26 +1,31 @@
 <?php
+
+/**
+ * Class DB for interacting with db.
+ * @depency app\utils
+ */
+
     class DB
     {
-        private $_db;
+        protected $_db;
         static $_instance;
 
-        private function __construct() {
+        protected function __construct($dbHost, $dbName, $dbUser, $dbPass) {
             try {
-                $this->_db = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME.';charset=UTF8', DB_USER, DB_PASS);
+                $this->_db = new PDO('mysql:host='.$dbHost.';dbname='.$dbName.';charset=UTF8', $dbUser, $dbPass);
                 $this->_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch (PDOException $e) {
-                print 'smth went wrong!';
-                die();
+                dd(static::class.' : smth went wrong!');
             }
         }
 
         private function __clone(){}
 
         public static function getInstance() {
-            if (!(self::$_instance instanceof self)) {
-                self::$_instance = new self();
+            if (!(static::$_instance instanceof static)) {
+                static::$_instance = new static();
             }
-            return self::$_instance;
+            return static::$_instance;
         }
 
         public static function query($sql, $params = []) {
@@ -36,6 +41,22 @@
                     "\nmessage: ".$e->getMessage()
                 );
             }
+
+            return false;
         }
 
+    }
+
+    class CERT_DB extends DB
+    {
+        protected function __construct() {
+            parent::__construct(CERT_DB_HOST, CERT_DB_NAME, CERT_DB_USER, CERT_DB_PASS);
+        }
+    }
+
+    class ADDR_DB extends DB
+    {
+        protected function __construct() {
+            parent::__construct(ADDR_DB_HOST, ADDR_DB_NAME, ADDR_DB_USER, ADDR_DB_PASS);
+        }
     }

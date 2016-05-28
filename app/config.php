@@ -16,15 +16,23 @@
     const VERIFY_ERR            = -1;
     const VERIFY_OK             =  0;
 
-    const DB_HOST   = 'host';
-    const DB_USER   = 'root';
-    const DB_PASS   = '';
-    const DB_NAME   = 'db';
+    const CERT_DB_HOST   = 'localhost';
+    const CERT_DB_USER   = 'root';
+    const CERT_DB_PASS   = '';
+    const CERT_DB_NAME   = 'edusite';
 
-    const DB_KEYS_TABLE  = 'cert';
-    const DB_CERT_TABLE  = 'certificate';
+    const CERT_DB_KEYS_TABLE  = 'cert';
+    const CERT_DB_CERT_TABLE  = 'certificate';
     
     const CERT_ALLOWED_STATUSES = [1]; // min 1 elem
+
+    const ADDR_DB_HOST   = 'localhost';
+    const ADDR_DB_USER   = 'root';
+    const ADDR_DB_PASS   = '';
+    const ADDR_DB_NAME   = 'edusite';
+
+    const ADDR_DB_REGIONS_TABLE = 'regions';
+    const ADDR_DB_POST_TYPE_TABLE = 'postindex_type';
 
     $A = [
         gmp_init('0x8e20faa72ba0b470'), gmp_init('0x47107ddd9b505a38'), gmp_init('0xad08b0e0c3282d1c'), gmp_init('0xd8045870ef14980e'),
