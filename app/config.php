@@ -31,9 +31,8 @@
 
     const CERT_FILE_FOLDER = 'cert';
     const CERT_FILE_ALLOWED_DATA = [
-        'cert_number', 'name', 'country', 'region',
-        'city', 'street', 'house', 'kvartira',
-        'korpus', 'date_begin', 'date_end',
+        'cert_number', 'name',
+        'date_begin', 'date_end',
         'edu_name', 'email', 'phone', 'inn'
     ];
 
