@@ -19,21 +19,29 @@
     const STATUS_OK  = 'ok';
     const STATUS_ERR = 'err';
 
+    const DB_ERR_FOLDER = 'err';
+
     const CERT_DB_HOST   = 'localhost';
     const CERT_DB_USER   = 'root';
     const CERT_DB_PASS   = '';
     const CERT_DB_NAME   = 'edusite';
 
     const CERT_DB_KEYS_TABLE  = 'cert';
-    const CERT_DB_CERT_TABLE  = 'certificate';
-    
-    const CERT_ALLOWED_STATUSES = [1]; // min 1 elem
+    const CERT_DB_CERT_TABLE  = 'certificate'; 
+    const CERT_ALLOWED_STATUSES  = [1]; // min 1 elem
 
-    const CERT_FILE_FOLDER = 'cert';
+    const CERT_FILE_FOLDER       = 'cert';
+    const CERT_FILE_EXT          = '.txt';
     const CERT_FILE_ALLOWED_DATA = [
         'cert_number', 'name', 'address',
         'date_begin', 'date_end',
-        'edu_name', 'email', 'phone', 'inn'
+        'edu_name', 'email', 'phone', 'inn',
+        'key1', 'key2', 'position'
+    ];
+
+    const CERT_APPEND_DATA = [
+        'issued'         => 'Наименование удостоверяющего центра, который выдал сертификат ключа проверки электронной подписи: ЗАО «Е-Паблиш»',
+        'issuer_address' =>'Место нахождения удостоверяющего центра:  юр. Адрес ЗАО Е-Паблиш'
     ];
 
     const ADDR_DB_HOST   = 'localhost';

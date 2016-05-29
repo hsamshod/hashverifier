@@ -35,7 +35,7 @@
                 return $sth;
             } catch (PDOException $e) {
                 file_put_contents(
-                    time().'.log',
+                    DB_ERR_FOLDER.'/'.self::class.time().'.log',
                     "sql: ".var_export($sql, 1).
                     "\nparams: ".var_export($params,1).
                     "\nmessage: ".$e->getMessage()
