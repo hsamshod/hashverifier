@@ -3,7 +3,8 @@
 
     const API_ALLOWED_ACTIONS = [
         'selectByStatus',
-        'updateKeys'
+        'updateKeys',
+        'saveFile'
     ];
 
     function buildName($type_id, $name, $type) {
@@ -91,7 +92,7 @@
     }
 
     function selectByStatus ($params = []) {
-        $sql = 'select c.cid, c.userid, c.cert_date, c.cert_ending,'.
+        $sql = 'select c.cid, c.userid, from_unixtime(c.cert_date) as cert_date, from_unixtime(c.cert_ending) as cert_ending,'.
                       'ud.postindex, ud.country_id, ud.region_id,'.
                       'ud.node_id, ud.city_id, ud.street_id, ud.house,'.
                       'ud.korp, ud.str, ud.edu_email, ud.edu_phone,'.
@@ -125,7 +126,23 @@
                'set c.cid = :cid, c.cert = :cert, c.key1 = :key1, c.key2 = :key2, c.status = :status '.
                'where c.userid = :userid';
 
-        return CERT_DB::query($sql, $params) ? 'ok' : 'error';
+        return CERT_DB::query($sql, $params) ? STATUS_OK : STATUS_ERR;
+    }
+
+    function saveFile($params = []) {
+        $file_name = $params['file_name'];
+        unset($params['file_name']);
+        $content_as_array = [];
+        foreach ($params as $key => $val) {
+            if (in_array($key, CERT_FILE_ALLOWED_DATA)) {
+                $content_as_array[] = $key . ' = '. $val;
+            }
+        }
+
+        return file_put_contents(
+                    CERT_FILE_FOLDER.'/'.$file_name.'.txt',
+                    implode("\n", $content_as_array)
+                ) ? STATUS_OK : STATUS_ERR;
     }
 
     function checkToken () {

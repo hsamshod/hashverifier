@@ -16,6 +16,9 @@
     const VERIFY_ERR            = -1;
     const VERIFY_OK             =  0;
 
+    const STATUS_OK  = 'ok';
+    const STATUS_ERR = 'err';
+
     const CERT_DB_HOST   = 'localhost';
     const CERT_DB_USER   = 'root';
     const CERT_DB_PASS   = '';
@@ -25,6 +28,14 @@
     const CERT_DB_CERT_TABLE  = 'certificate';
     
     const CERT_ALLOWED_STATUSES = [1]; // min 1 elem
+
+    const CERT_FILE_FOLDER = 'cert';
+    const CERT_FILE_ALLOWED_DATA = [
+        'cert_number', 'name', 'country', 'region',
+        'city', 'street', 'house', 'kvartira',
+        'korpus', 'date_begin', 'date_end',
+        'edu_name', 'email', 'phone', 'inn'
+    ];
 
     const ADDR_DB_HOST   = 'localhost';
     const ADDR_DB_USER   = 'root';
