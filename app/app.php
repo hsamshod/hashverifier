@@ -41,11 +41,14 @@
 	 * @return array|false			Verifier data.
 	 */
 	function getKeys ($verifier_id) {
+		list($user_id, $cid) = explode('/', str_replace('u', '', $verifier_id));
 		$sql =  'select key1, key2 from '.CERT_DB_KEYS_TABLE.' '.
-				'where userid = :verifier_id and cert_ending > now() and status in (:statuses) '.
+				'where userid = :user_id and cid = :cid and '.
+					  'cert_ending > now() and status in (:statuses) '.
 				'limit 1';
 		$sth = CERT_DB::exec($sql, [
-			':verifier_id' => $verifier_id,
+			':cid' 		=> $cid,
+			':user_id'  => $user_id,
 			':statuses' => implode(',', CERT_ALLOWED_STATUSES)
 		]);
 
@@ -56,16 +59,17 @@
 	}
 
 	/**
-	 * fucked up writing docs.
+	 * Return cert file content.
 	 */
 	function getVerifierData ($verifier_id) {
-		$sql =  'select * from '.CERT_DB_CERT_TABLE.' '.
-				'where cid = :verifier_id '.
-				'limit 1';
-		$sth = CERT_DB::exec($sql, [
-			':verifier_id' => $verifier_id 
-		]);
-		return $sth->fetch();
+		$file_name = CERT_FILE_FOLDER.'/'.str_replace('/', '_', $verifier_id).CERT_FILE_EXT;
+		$data = [];
+
+		if (file_exists($file_name)) {
+			$data = parse_ini_file($file_name);
+		}
+
+		return $data;
 	}
 
 	function verify () {
@@ -93,8 +97,8 @@
             	list($sign, $verifier_id) = $data;
             	if (!($sign && $verifier_id)) {
                 	return VERIFY_SIGN_ERR;
-            	}
-				
+				}
+
 				list($x, $y) = getKeys($verifier_id);
 				if (!($x && $y)) {
                 	return VERIFY_KEY_ERR;
