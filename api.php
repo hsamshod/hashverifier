@@ -4,7 +4,8 @@
     const API_ALLOWED_ACTIONS = [
         'selectByStatus',
         'updateKeys',
-        'saveFile'
+        'saveFile',
+        'updateStatus'
     ];
 
     function checkToken () {

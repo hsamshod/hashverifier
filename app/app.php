@@ -236,10 +236,18 @@
 	}
 
 	function updateKeys ($params = []) {
-		$sql = 'update cert c '.
-			'set c.cert = :cert, c.key1 = :key1, c.key2 = :key2, c.status = :status '.
-			'where c.userid = :userid and c.cid = :cid';
+		$sql =  'update cert c '.
+			    'set c.cert = :cert, c.key1 = :key1, c.key2 = :key2, c.status = :status '.
+			    'where c.userid = :userid and c.cid = :cid';
 	
+		return CERT_DB::query($sql, $params) ? STATUS_OK : STATUS_ERR;
+	}
+
+	function updateStatus ($params = []) {
+		$sql =  'update cert c '.
+                'set c.status = :status '.
+                'where c.userid = :userid and c.cid = :cid';
+
 		return CERT_DB::query($sql, $params) ? STATUS_OK : STATUS_ERR;
 	}
 
