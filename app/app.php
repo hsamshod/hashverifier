@@ -225,7 +225,7 @@
 
 			/* получаем адреса */
 			foreach ($data as &$d) {
-
+				$d->edu_name = html_entity_decode($d->edu_name);
 				$d->address = getAddress([
 					'postindex' => $d->postindex, 'country_id' => $d->country_id,
 					'region_id' => $d->region_id, 'node_id' => $d->node_id,
