@@ -239,6 +239,23 @@
 		}
 	}
 
+	function selectById ($params = []) {
+		$sql = 	'select c.key1, c.key2, from_unixtime(c.cert_ending) as cert_ending, '.
+				'c.edu_eds_fio, c.edu_eds_phone, c.edu_eds_mail, c.edu_eds_ranc, '.
+				'ud.edu_name '.
+				'from cert c '.
+				'join user_data ud on c.userid = ud.userid '.
+				'where c.cid = :cid and c.userid = :userid';
+		$result = CERT_DB::query($sql, $params);
+
+		if ($result) {
+			$data = $result->fetchAll(PDO::FETCH_OBJ);
+			return $data;
+		} else {
+			return $result;
+		}
+	}
+
 	function updateKeys ($params = []) {
 		$sql =  'update cert c '.
 			    'set c.cert = :cert, c.key1 = :key1, c.key2 = :key2, c.status = :status '.

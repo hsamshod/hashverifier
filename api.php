@@ -3,6 +3,7 @@
 
     const API_ALLOWED_ACTIONS = [
         'selectByStatus',
+        'selectById',
         'updateKeys',
         'saveFile',
         'updateStatus'
