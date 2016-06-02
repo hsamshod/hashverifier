@@ -6,7 +6,8 @@
         'selectById',
         'updateKeys',
         'saveFile',
-        'updateStatus'
+        'updateStatus',
+        'selectStatusById'
     ];
 
     function checkToken () {

@@ -256,6 +256,20 @@
 		}
 	}
 
+	function selectStatusById ($params = []) {
+		$sql = 	'select c.status '.
+				'from cert c '.
+				'where c.cid = :cid and c.userid = :userid';
+		$result = CERT_DB::query($sql, $params);
+
+		if ($result) {
+			$data = $result->fetchAll(PDO::FETCH_OBJ);
+			return $data;
+		} else {
+			return $result;
+		}
+	}
+
 	function updateKeys ($params = []) {
 		$sql =  'update cert c '.
 			    'set c.cert = :cert, c.key1 = :key1, c.key2 = :key2, c.status = :status '.
