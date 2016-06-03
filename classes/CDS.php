@@ -35,9 +35,9 @@ class CDS {
         return $G;
     }
 
-    public function verifDS(String $H, String $sign, $Q)
+    public function verifDS($H, $sign, $Q)
     {
-        $n_bitCount = 256; //strlen(gmp_strval($this->n));
+        $n_bitCount = 256;
         $n_bitCount_div_4 = $n_bitCount / 4;
         $Rvector = substr($sign, 0, $n_bitCount_div_4);
         $Svector = substr($sign, $n_bitCount_div_4, $n_bitCount_div_4);

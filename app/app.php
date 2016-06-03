@@ -44,16 +44,16 @@
 		list($user_id, $cid) = explode('/', str_replace('u', '', $verifier_id));
 		$sql =  'select key1, key2 from '.CERT_DB_KEYS_TABLE.' '.
 				'where userid = :user_id and cid = :cid and '.
-					  'cert_ending > now() and status in (:statuses) '.
+					  'from_unixtime(cert_ending) > now() and status in (:statuses) '.
 				'limit 1';
-		$sth = CERT_DB::exec($sql, [
-			':cid' 		=> $cid,
-			':user_id'  => $user_id,
-			':statuses' => implode(',', CERT_ALLOWED_STATUSES)
-		]);
 
-		if ($sth->num_rows) {
-			return $sth->fetch();
+		$result = CERT_DB::query($sql, [
+						':cid' 		=> $cid,
+						':user_id'  => $user_id,
+						':statuses' => implode(',', CERT_ALLOWED_STATUSES)
+				  ]);
+		if ($result) {
+			return $result->fetch(PDO::FETCH_NUM);
 		}
 		return false;
 	}
@@ -119,6 +119,32 @@
                 return $return;
             }
 		}
+	}
+
+	function verifyByParams ($params = []) {
+		if ($params['userid'] && $params['cid'] && $params['hash'] && $params['sign']) {
+			$hash = $params['hash'];
+			$sign = $params['sign'];
+			$verifier_id = 'u' . $params['userid'] . '/' . $params['cid'];
+
+			$p = gmp_init("57896044618658097711785492504343953926634992332820282019728792003956564821041");
+			$a = gmp_init("7");
+			$b = gmp_init("0x43308876546767276905765904595650931995942111794451039583252968842033849580414");
+			$xG = [];
+			$n = gmp_init("0x8000000000000000000000000000000150FE8A1892976154C59CFC193ACCF5B3");
+
+			$DS = new CDS($p, $a, $b, $n, $xG);
+			list($x, $y) = getKeys($verifier_id);
+
+			if ($x && $y) {
+				$Q = $DS->gDecompression();
+				$Q->x = gmp_init('0x' . $x);
+				$Q->y = gmp_init('0x' . $y);
+
+				return $DS->verifDS(strtolower($hash), $sign, $Q) == VERIFY_OK;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -210,14 +236,14 @@
 	}
 
 	function selectByStatus ($params = []) {
-		$sql = 'select c.cid, c.userid, from_unixtime(c.cert_date) as cert_date, from_unixtime(c.cert_ending) as cert_ending,'.
-			'ud.postindex, ud.country_id, ud.region_id, ud.node_id,'.
-			'ud.city_id, ud.street_id, ud.house, ud.korp, ud.str,'.
-			'c.edu_eds_mail, c.edu_eds_phone, c.edu_eds_fio, c.edu_eds_ranc,'.
-			'ud.edu_name, ud.inn_kpp '.
-			'from cert c '.
-			'join user_data ud on c.userid = ud.userid '.
-			'where c.status = :status';
+		$sql =  'select c.cid, c.userid, from_unixtime(c.cert_date) as cert_date, from_unixtime(c.cert_ending) as cert_ending,'.
+				'ud.postindex, ud.country_id, ud.region_id, ud.node_id,'.
+				'ud.city_id, ud.street_id, ud.house, ud.korp, ud.str,'.
+				'c.edu_eds_mail, c.edu_eds_phone, c.edu_eds_fio, c.edu_eds_ranc,'.
+				'ud.edu_name, ud.inn_kpp '.
+				'from cert c '.
+				'join user_data ud on c.userid = ud.userid '.
+				'where c.status = :status';
 		$result = CERT_DB::query($sql, $params);
 
 		if ($result) {

@@ -28,7 +28,7 @@
 
     const CERT_DB_KEYS_TABLE  = 'cert';
     const CERT_DB_CERT_TABLE  = 'certificate'; 
-    const CERT_ALLOWED_STATUSES  = [1]; // min 1 elem
+    const CERT_ALLOWED_STATUSES  = [1,2,3,4,5,6]; // min 1 elem
 
     const CERT_FILE_FOLDER       = 'cert';
     const CERT_FILE_EXT          = '.txt';
