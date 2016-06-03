@@ -43,15 +43,14 @@
 	function getKeys ($verifier_id) {
 		list($user_id, $cid) = explode('/', str_replace('u', '', $verifier_id));
 		$sql =  'select key1, key2 from '.CERT_DB_KEYS_TABLE.' '.
-				'where userid = :user_id and cid = :cid and '.
-					  'from_unixtime(cert_ending) > now() and status in (:statuses) '.
+				'where userid = :user_id and cid = :cid '.
 				'limit 1';
 
 		$result = CERT_DB::query($sql, [
 						':cid' 		=> $cid,
-						':user_id'  => $user_id,
-						':statuses' => implode(',', CERT_ALLOWED_STATUSES)
+						':user_id'  => $user_id
 				  ]);
+
 		if ($result) {
 			return $result->fetch(PDO::FETCH_NUM);
 		}
@@ -140,8 +139,7 @@
 				$Q = $DS->gDecompression();
 				$Q->x = gmp_init('0x' . $x);
 				$Q->y = gmp_init('0x' . $y);
-
-				return $DS->verifDS(strtolower($hash), $sign, $Q) == VERIFY_OK;
+				return $DS->verifDS(strtolower($hash), $sign, $Q) === VERIFY_OK;
 			}
 		}
 		return false;
@@ -263,6 +261,21 @@
 		} else {
 			return $result;
 		}
+	}
+
+	function updateTimeStamps ($params = []) {
+		$sql =  'update cert '.
+				'set cert_date = :begin, cert_ending = :end '.
+				'where cid = :cid and userid = :userid';
+
+		return CERT_DB::query(
+			$sql,
+			array_merge(
+				$params, [
+					':begin' => (new DateTime)->getTimestamp(),
+					':end'   => (new DateTime)->modify('+1 year')->getTimestamp()
+				]
+			)) ? 1 : 0;
 	}
 
 	function selectById ($params = []) {

@@ -7,6 +7,7 @@
         'updateKeys',
         'saveFile',
         'updateStatus',
+        'updateTimeStamps',
         'selectStatusById',
         'verifyByParams'
     ];
