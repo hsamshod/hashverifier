@@ -61,13 +61,16 @@
 	 * Return cert file content.
 	 */
 	function getVerifierData ($verifier_id) {
-		$file_name = CERT_FILE_FOLDER.'/'.str_replace('/', '_', $verifier_id).CERT_FILE_EXT;
+		$file_name = realpath(dirname(__FILE__).'/../'.CERT_FILE_FOLDER).'/'.str_replace('/', '_', $verifier_id).CERT_FILE_EXT;
 		$data = [];
-
 		if (file_exists($file_name)) {
 			$data = parse_ini_file($file_name);
 		}
-
+		foreach ($data as $k => $d) {
+			if (!in_array($k, CERT_FILE_SHOW_FIELDS)) {
+				unset($data[$k]);
+			}
+		}
 		return $data;
 	}
 
@@ -89,12 +92,15 @@
 		if(!($fileToVerify = getFile($url))) {
 			return VERIFY_FILE_ERR;
 		} else {
-			$hash = $strHash->GetGostHash($fileToVerify);			
+			$hash = $strHash->GetGostHash($fileToVerify);
 			if(!$data = getFileSign($url)) {
                 return VERIFY_SIGN_ERR;
             } else {
-            	list($sign, $verifier_id) = $data;
-            	if (!($sign && $verifier_id)) {
+				list($sign, $verifier_id, $sign_date) = $data;
+				$sign = trim($sign);
+				$verifier_id = trim($verifier_id);
+
+				if (!($sign && $verifier_id)) {
                 	return VERIFY_SIGN_ERR;
 				}
 
@@ -108,9 +114,8 @@
 				$Q->y = gmp_init('0x' . $y);
 
 				$result = $DS->verifDS($hash, $sign, $Q);
-
-				if ($result == VERIFY_OK) {
-                    $return = getVerifierData($verifier_id);
+				if ($result === VERIFY_OK) {
+					$return = array_merge(['sign_date' => $sign_date], getVerifierData($verifier_id));
 	            } else {
                     $return = VERIFY_ERR;
 	            }
@@ -267,15 +272,16 @@
 		$sql =  'update cert '.
 				'set cert_date = :begin, cert_ending = :end '.
 				'where cid = :cid and userid = :userid';
-
+		$begin = (new DateTime);
+		$end   = (new DateTime)->modify('+1 year');
 		return CERT_DB::query(
 			$sql,
 			array_merge(
 				$params, [
-					':begin' => (new DateTime)->getTimestamp(),
-					':end'   => (new DateTime)->modify('+1 year')->getTimestamp()
+					':begin' => $begin->getTimestamp(),
+					':end'   => $end->getTimestamp()
 				]
-			)) ? 1 : 0;
+			)) ? $begin->format('Y-m-d H:i:s').'|'.$end->format('Y-m-d H:i:s') : 0;
 	}
 
 	function selectById ($params = []) {

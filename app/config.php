@@ -35,9 +35,17 @@
     const CERT_FILE_ALLOWED_DATA = [
         'cert_number', 'name', 'address',
         'date_begin', 'date_end',
-        'edu_name', 'email', 'phone', 'inn',
-        'key1', 'key2', 'position'
+        'edu_name', 'email', 'edu_rank',
+        'phone', 'inn', 'key1', 'key2',
+        'name_center', 'address_center'
     ];
+    
+    const CERT_FILE_SHOW_FIELDS = [
+        'name', 'inn', 'address',
+        'edu_name', 'edu_rank',
+        'name_center', 'address_center'
+    ];
+
 
     const CERT_APPEND_DATA = [
         'issued'         => 'Наименование удостоверяющего центра, который выдал сертификат ключа проверки электронной подписи: ЗАО «Е-Паблиш»',
