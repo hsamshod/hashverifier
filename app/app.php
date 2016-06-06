@@ -20,7 +20,26 @@
 		$context = stream_context_create($opts);
 		return file_get_contents($url, false, $context);
 	}
-	
+
+    /**
+     * @param $field                $_FILES array field.
+     * @param bool $explode         Whether file should be returned as array/
+     * @return array|bool|string    File content as string or array if uploaded, fale else.
+     */
+	function getUploadedFile($field, $explode = false) {
+		$f = $_FILES[$field];
+		if ($f['error'] == 0) {
+			$tmp_name = $f['tmp_name'];
+			if ($content = file_get_contents($tmp_name)) {
+				if ($explode) {
+					$content = explode("\n", $content);
+				}
+				return $content;
+			}
+		}
+		return false;
+  	}
+
 	/**
 	 * @param string $url  	 Address of file sign of to get.
 	 *
@@ -77,23 +96,69 @@
 	function verify () {
 		$url = urldecode($_SERVER['QUERY_STRING']);
 		if (!filter_var($url, FILTER_VALIDATE_URL)) {
-			return VERIFY_PARAM_ERR; 
+			return VERIFY_PARAM_ERR;
 		}
-
-		$p = gmp_init("57896044618658097711785492504343953926634992332820282019728792003956564821041");
-		$a = gmp_init("7");
-		$b = gmp_init("0x43308876546767276905765904595650931995942111794451039583252968842033849580414");
-		$xG = [];
-		$n = gmp_init("0x8000000000000000000000000000000150FE8A1892976154C59CFC193ACCF5B3");
-
-		$strHash = new StringHash(512);
-		$DS = new CDS($p, $a, $b, $n, $xG);
 		
 		if(!($fileToVerify = getFile($url))) {
 			return VERIFY_FILE_ERR;
 		} else {
+			$p = gmp_init("57896044618658097711785492504343953926634992332820282019728792003956564821041");
+			$a = gmp_init("7");
+			$b = gmp_init("0x43308876546767276905765904595650931995942111794451039583252968842033849580414");
+			$xG = [];
+			$n = gmp_init("0x8000000000000000000000000000000150FE8A1892976154C59CFC193ACCF5B3");
+
+			$strHash = new StringHash(512);
+			$DS = new CDS($p, $a, $b, $n, $xG);
+
 			$hash = $strHash->GetGostHash($fileToVerify);
 			if(!$data = getFileSign($url)) {
+                return VERIFY_SIGN_ERR;
+            } else {
+				list($sign, $verifier_id, $sign_date) = $data;
+				$sign = trim($sign);
+				$verifier_id = trim($verifier_id);
+
+				if (!($sign && $verifier_id)) {
+                	return VERIFY_SIGN_ERR;
+				}
+
+				list($x, $y) = getKeys($verifier_id);
+				if (!($x && $y)) {
+                	return VERIFY_KEY_ERR;
+				}
+				
+				$Q = $DS->gDecompression();
+				$Q->x = gmp_init('0x' . $x);
+				$Q->y = gmp_init('0x' . $y);
+
+				$result = $DS->verifDS($hash, $sign, $Q);
+				if ($result === VERIFY_OK) {
+					$return = array_merge(['sign_date' => $sign_date], getVerifierData($verifier_id));
+	            } else {
+                    $return = VERIFY_ERR;
+	            }
+
+                return $return;
+            }
+		}
+	}
+
+	function verifyFile () {
+		if(!($fileToVerify = getUploadedFile('file'))) {
+			return VERIFY_FILE_ERR;
+		} else {
+			$p = gmp_init("57896044618658097711785492504343953926634992332820282019728792003956564821041");
+			$a = gmp_init("7");
+			$b = gmp_init("0x43308876546767276905765904595650931995942111794451039583252968842033849580414");
+			$xG = [];
+			$n = gmp_init("0x8000000000000000000000000000000150FE8A1892976154C59CFC193ACCF5B3");
+
+			$strHash = new StringHash(512);
+			$DS = new CDS($p, $a, $b, $n, $xG);
+
+			$hash = $strHash->GetGostHash($fileToVerify);
+			if(!$data = getUploadedFile('sign', true)) {
                 return VERIFY_SIGN_ERR;
             } else {
 				list($sign, $verifier_id, $sign_date) = $data;
@@ -148,6 +213,19 @@
 			}
 		}
 		return false;
+	}
+
+	/** Interface functions **/
+	function view($fileName = '', $data = []) {
+		global $l;
+		extract($data);
+		if ($fileName && file_exists(VIEWS_FOLDER.$fileName.'.php')) {
+			include VIEWS_FOLDER.$fileName.'.php';
+		}
+	}
+
+	function verifyCaptcha ($value) {
+		return strtolower($_SESSION['captcha']) === strtolower($value);
 	}
 
 	/**

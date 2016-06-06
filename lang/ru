@@ -1,0 +1,30 @@
+title = Верификация сертификатов;
+header = Верификация сертификата;
+
+cert_err = Файл не загружен;
+cert_not_verified = 'Верификация не прошла! Цифровая подпись не верна.';
+cert_not_found = Цифровая подпись не найдена;
+cert_verified = Верификация прошла успешно. Цифровая подпись верна.;
+captcha_err = Код с картинки не верна.;
+
+
+choose_file = Выберите файл;
+choose_sign = Выберите подпись файла;
+enter_captcha = Введите код с картинки;
+submit_button_text = Проверить;
+       
+cert_info_title = Информация о заверяющей;
+cert_info_date = Дата подписи
+cert_info_city = Город
+cert_info_organization = Организация
+cert_info_position = Должность
+cert_info_fio = ФИО
+
+cert_info_name           = Название
+cert_info_inn            = ИНН
+cert_info_address        = Адрес
+cert_info_edu_name       = Организация
+cert_info_edu_rank       = Должность
+cert_info_name_center    = Центр
+cert_info_address_center = Адрес центра
+cert_info_sign_date      = Дата выдачи

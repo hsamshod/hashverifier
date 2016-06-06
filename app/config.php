@@ -185,3 +185,17 @@
     ];
 
     $maxLength = 70;
+
+    /**  interface config **/
+    const VIEWS_FOLDER = 'view/';
+    const LANG_STORAGE = 'lang/';
+
+    $langs = ['ru', 'en'];
+    $default_lang = 'ru';
+
+    if (isset($_GET['lang']) && in_array($_GET['lang'], $langs)) {
+        $lang = $_GET['lang'];
+    } else {
+        $lang = $default_lang;
+    }
+    $l = parse_ini_file(LANG_STORAGE.$lang);

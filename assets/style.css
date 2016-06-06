@@ -1,0 +1,31 @@
+body {
+    font-family: "Open Sans", Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    background: #F3F3F3;
+}
+.container {
+    margin-top: 30px;
+    background-color: #FFF;
+    border: 1px solid #CCC;
+    border-top: 1px solid #DDD;
+    border-left: 1px solid #DDD;
+    box-shadow: 3px 3px 3px rgba(150,150,150,0.2);
+}
+.flash {
+    padding: 10px 20px;
+}
+#captcha-img {
+    border-radius: 4px;
+}
+.list-group li {
+    list-style: none;
+    padding: 5px 0px 0px;
+}
+.list-group li b {
+    display: inline-block;
+    width: 150px;
+}
+#verifier-info {
+    margin-bottom: 20px;
+}
