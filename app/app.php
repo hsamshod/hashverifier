@@ -83,7 +83,7 @@
 		$file_name = realpath(dirname(__FILE__).'/../'.CERT_FILE_FOLDER).'/'.str_replace('/', '_', $verifier_id).CERT_FILE_EXT;
 		$data = [];
 		if (file_exists($file_name)) {
-			$data = parse_ini_file($file_name);
+			$data = parse_ini_file($file_name, false, INI_SCANNER_RAW);
 		}
 		foreach ($data as $k => $d) {
 			if (!in_array($k, CERT_FILE_SHOW_FIELDS)) {
