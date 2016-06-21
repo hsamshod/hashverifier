@@ -180,9 +180,11 @@
 
 				$result = $DS->verifDS($hash, $sign, $Q);
 				if ($result === VERIFY_OK) {
-					$return = array_merge(['sign_date' => $sign_date], getVerifierData($verifier_id));
+					list($user_id, $cid) = explode('/', str_replace('u', '', $verifier_id));
+					$status = selectStatusById([':userid' => $user_id, ':cid' => $cid])[0]->status;
+					$return = array_merge(['code' => VERIFY_OK, 'status' => $status, 'sign_date' => $sign_date], getVerifierData($verifier_id));
 	            } else {
-                    $return = VERIFY_ERR;
+                    $return = array_merge(['code' => VERIFY_ERR, 'sign_date' => $sign_date], getVerifierData($verifier_id));
 	            }
 
                 return $return;
@@ -397,6 +399,14 @@
 		$sql =  'update cert c '.
 			    'set c.cert = :cert, c.key1 = :key1, c.key2 = :key2, c.status = :status '.
 			    'where c.userid = :userid and c.cid = :cid';
+	
+		return CERT_DB::query($sql, $params) ? STATUS_OK : STATUS_ERR;
+	}
+
+	function updateCert ($params = []) {
+		$sql =  'update cert '.
+			    'set edu_eds_fio = :fio, edu_eds_mail = :email, edu_eds_phone = :phone, edu_eds_ranc = :ranc '.
+			    'where userid = :userid and cid = :cid';
 	
 		return CERT_DB::query($sql, $params) ? STATUS_OK : STATUS_ERR;
 	}

@@ -12,6 +12,7 @@ api methods
  - saveFile
  - updateTimeStamps
  - verifyByParams
+ - updateCert
 
 site.com/api.php?action=selectByStatus&params[:status]=1
 
@@ -28,3 +29,5 @@ site.com/api.php?action=saveFile&params[file_name]=u123/1&params[date_end]=2016
 site.com/api.php?action=verifyByParams&params[userid]=2&params[cid]=17&params[hash]=abs&params[sign]=123qa
 
 site.com/api.php?action=updateTimeStamps&params[userid]=1&params[cid]=2
+
+site.com/api.php?action=updateCert&params[:fio]=ivan&params[:email]=em@il.com&params[:phone]=256&params[::ranc]=dean&params[:userid]=2&params[:cid]=1

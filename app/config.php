@@ -16,6 +16,8 @@
     const VERIFY_ERR            = -1;
     const VERIFY_OK             =  0;
 
+    const STATUS_BANNED  = 6;
+
     const STATUS_OK  = 'ok';
     const STATUS_ERR = 'err';
 
@@ -41,8 +43,8 @@
     ];
     
     const CERT_FILE_SHOW_FIELDS = [
-        'name', 'inn', 'address',
-        'edu_name', 'edu_rank',
+        'name', 'edu_rank', 'edu_name',
+        'inn', 'address',
         'name_center', 'address_center'
     ];
 

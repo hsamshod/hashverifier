@@ -8,33 +8,39 @@
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.21/vue.min.js"></script>
-     <script src="assets/app.js"></script>
+    <script src="assets/app.js"></script>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
+    <div class="logo"><table border=0 cellspacing=0 cellpadding=0 width="100%"><tr><td width="25%"><img src="assets/images/logo.png" width="180px" /></td><td valign="bottom" id="slogan"width="50%"><a href="<?= HOST; ?>" ><span style="text-decoration:none; color:#ff6600;paddingleft:0px;">Affix.</span><span>E-Publish.Ru</a></span><span style="color:#497285;padding-left:20px;">Цифровая подпись документов</span></td><td width="25%"></td></tr></table></div>
+    
     <div class="container" id="app">
         <div class="row">
             <div class="col-md-12">
-                <h1><?= $l['header'] ?></h1>
-                <p class="flash bg-warning text-warning" v-show="<?= getFlash('error'); ?>"><?= $l['cert_err'] ?></p>
-                <p class="flash bg-danger text-danger" v-show="<?= getFlash('not_verified'); ?>"><?= $l['cert_not_verified'] ?></p>
-                <p class="flash bg-danger text-danger" v-show="<?= getFlash('sign_not_found'); ?>"><?= $l['cert_not_found'] ?></p>
-                <p class="flash bg-danger text-danger" v-show="<?= getFlash('captcha_err'); ?>"><?= $l['captcha_err'] ?></p>
+                <div class="info-block" v-show="<?= getFlash('showinfo'); ?>">
+                    <p class="flash text-red" v-show="<?= getFlash('captcha_err'); ?>"><?= $l['captcha_err'] ?></p>
+                    <p class="flash text-red" v-show="<?= getFlash('sign_not_found'); ?>"><?= $l['cert_not_found'] ?></p>
+                    <p class="flash text-red" v-show="<?= getFlash('file_err'); ?>"><?= $l['cert_file_err'] ?></p>
+                    <div v-show="<?= hasFlash('verified') || hasFlash('not_verified'); ?>">
+                        <p class="flash text-orange" v-show="<?= $data['status'] != STATUS_BANNED && getFlash('verified'); ?>"><?= $l['cert_verified'] ?></p>
+                        <p class="flash text-red" v-show="<?= $data['status'] == STATUS_BANNED && getFlash('verified'); ?>"><?= $l['cert_banned'] ?></p>
+                        <p class="flash text-orange" v-show="<?= getFlash('verified'); ?>"><?= $l['cert_verified'] ?></p>
+                        <p class="flash text-red" v-show="<?= getFlash('not_verified'); ?>"><?= $l['cert_not_verified'] ?></p>
 
-                <div v-show="<?= getFlash('verified'); ?>">
-                    <p class="flash bg-success text-success"><?= $l['cert_verified'] ?></p>
-
-                    <div id="verifier-info" class="flash bg-info text-info">
-                        <b><?=$l['cert_info_title']?></b>
-                        <div>
-                            <ul class="list-group">
-                                <?php foreach ($data as $k => $v) : ?>
-                                    <li><b><?= $l['cert_info_'.$k] . '</b> '.$v; ?></li>
-                                <?php endforeach; ?>
-                            </ul>
+                        <div id="verifier-info" class="flash text-info">
+                            <b><?=$l['cert_info_title']?>:</b>
+                            <div>
+                                <ul class="list-group">
+                                    <?php foreach (CERT_FILE_SHOW_FIELDS as $field) : ?>
+                                        <li><b><?= $l['cert_info_'.$field]; ?>:</b> <?= $data[$field]; ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <h1><?= $l['header'] ?></h1>
 
                 <form method="post" enctype="multipart/form-data">
                     <div class="form-group">
@@ -52,7 +58,7 @@
                                 <img id="captcha-img" src="app/captcha.php">
                             </div>
                             <div class="col-sm-11">
-                                <input type="text" name="captcha" id="captcha" class="form-control" placeholder="Введите код с картинки"
+                                <input type="text" name="captcha" id="captcha" class="form-control" placeholder="Введите защитный код"
                                        v-model="captchaInput"
                                        @change="disabled = captchaInput.length < 5">
                             </div>
@@ -72,5 +78,12 @@
             </div>
         </div>
     </div>
+
+    <div id="slider" >
+        <iframe class="row" id="frame" src="assets/slider/index.html" style="border:1px solid #fff;margin-top:100px;" scrolling="no" border="0"></iframe>
+    </div>    
+
+    <div id="footer">
+        <p> <span>&#x24B8; <?= VENDOR_TITLE ?>,</span><span> <a href="<?= VENDOR_FULL ?>" target="_blank"><?= VENDOR ?></a></span><span> <?= date('Y'); ?> г.</span></p></div> 
 </body>
 </html>
