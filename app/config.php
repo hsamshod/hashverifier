@@ -44,8 +44,12 @@
     
     const CERT_FILE_SHOW_FIELDS = [
         'name', 'edu_rank', 'edu_name',
-        'inn', 'address',
+        'inn', 'date_begin', 'sign_date', 'address',
         'name_center', 'address_center'
+    ];
+
+    const DATE_FIELDS = [
+        'date_begin'
     ];
 
 

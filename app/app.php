@@ -366,8 +366,8 @@
 
 	function selectById ($params = []) {
 		$sql = 	'select c.key1, c.key2, from_unixtime(c.cert_ending) as cert_ending, '.
-				'c.edu_eds_fio, c.edu_eds_phone, c.edu_eds_mail, c.edu_eds_ranc, '.
-				'ud.edu_name '.
+				'c.edu_eds_fio, c.edu_eds_phone, c.edu_eds_mail, c.edu_eds_ranc, c.cert_date, '.
+				'ud.edu_name, ud.inn_kpp '.
 				'from cert c '.
 				'join user_data ud on c.userid = ud.userid '.
 				'where c.cid = :cid and c.userid = :userid';
@@ -375,6 +375,7 @@
 
 		if ($result) {
 			$data = $result->fetchAll(PDO::FETCH_OBJ);
+			$data[0]->cert_date = date('Y-m-d', $data[0]->cert_date);
 			return $data;
 		} else {
 			return $result;

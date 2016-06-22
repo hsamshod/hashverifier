@@ -32,7 +32,7 @@
                             <div>
                                 <ul class="list-group">
                                     <?php foreach (CERT_FILE_SHOW_FIELDS as $field) : ?>
-                                        <li><b><?= $l['cert_info_'.$field]; ?>:</b> <?= $data[$field]; ?></li>
+                                        <li><b><?= $l['cert_info_'.$field]; ?>:</b> <?= in_array($field, DATE_FIELDS) ? date('d.m.Y', strtotime($data[$field])) : $data[$field]; ?></li>
                                     <?php endforeach; ?>
                                 </ul>
                             </div>
