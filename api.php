@@ -10,7 +10,8 @@
         'updateTimeStamps',
         'selectStatusById',
         'verifyByParams',
-        'updateCert'
+        'updateCert',
+        'updateInn'
     ];
 
     function checkToken () {

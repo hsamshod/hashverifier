@@ -408,7 +408,15 @@
 		$sql =  'update cert '.
 			    'set edu_eds_fio = :fio, edu_eds_mail = :email, edu_eds_phone = :phone, edu_eds_ranc = :ranc '.
 			    'where userid = :userid and cid = :cid';
-	
+
+		return CERT_DB::query($sql, $params) ? STATUS_OK : STATUS_ERR;
+	}
+
+	function updateInn ($params = []) {
+		$sql =  'update user_data '.
+			    'set inn_kpp = :inn '.
+			    'where userid = :userid';
+
 		return CERT_DB::query($sql, $params) ? STATUS_OK : STATUS_ERR;
 	}
 
