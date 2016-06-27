@@ -134,10 +134,12 @@
 
 				$result = $DS->verifDS($hash, $sign, $Q);
 				if ($result === VERIFY_OK) {
-					$return = array_merge(['sign_date' => $sign_date], getVerifierData($verifier_id));
-	            } else {
-                    $return = VERIFY_ERR;
-	            }
+					list($user_id, $cid) = explode('/', str_replace('u', '', $verifier_id));
+					$status = selectStatusById([':userid' => $user_id, ':cid' => $cid])[0]->status;
+					$return = array_merge(['code' => VERIFY_OK, 'status' => $status, 'sign_date' => $sign_date], getVerifierData($verifier_id));
+				} else {
+					$return = array_merge(['code' => VERIFY_ERR, 'sign_date' => $sign_date], getVerifierData($verifier_id));
+				}
 
                 return $return;
             }
@@ -212,6 +214,8 @@
 				$Q->x = gmp_init('0x' . $x);
 				$Q->y = gmp_init('0x' . $y);
 				return $DS->verifDS(strtolower($hash), $sign, $Q) === VERIFY_OK;
+			} else {
+				return 0;
 			}
 		}
 		return false;

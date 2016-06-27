@@ -17,11 +17,11 @@
     <div class="container" id="app">
         <div class="row">
             <div class="col-md-12">
-                <div class="info-block" v-show="<?= getFlash('showinfo'); ?>">
+                <div class="info-block" v-show="<?= hasFlash('showinfo'); ?>">
                     <p class="flash text-red" v-show="<?= getFlash('captcha_err'); ?>"><?= $l['captcha_err'] ?></p>
                     <p class="flash text-red" v-show="<?= getFlash('sign_not_found'); ?>"><?= $l['cert_not_found'] ?></p>
                     <p class="flash text-red" v-show="<?= getFlash('file_err'); ?>"><?= $l['cert_file_err'] ?></p>
-                    <div v-show="<?= hasFlash('verified') || hasFlash('not_verified'); ?>">
+                    <div v-show="<?= hasFlash('verified') || getFlash('not_verified'); ?>">
                         <p class="flash text-orange" v-show="<?= $data['status'] != STATUS_BANNED && getFlash('verified'); ?>"><?= $l['cert_verified'] ?></p>
                         <p class="flash text-red" v-show="<?= $data['status'] == STATUS_BANNED && getFlash('verified'); ?>"><?= $l['cert_banned'] ?></p>
                         <p class="flash text-orange" v-show="<?= getFlash('verified'); ?>"><?= $l['cert_verified'] ?></p>
@@ -40,42 +40,50 @@
                     </div>
                 </div>
 
-                <h1><?= $l['header'] ?></h1>
-
-                <form method="post" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="chooseFile"><?= $l['choose_file'] ?></label>
-                        <input type="file" name="file" id="chooseFile" class="form-control" v-model="file">
-                    </div>
-                    <div class="form-group">
-                        <label for="chooseFile"><?= $l['choose_sign'] ?></label>
-                        <input type="file" name="sign" id="chooseSign" class="form-control" v-model="sign">
-                    </div>
-                    <div class="form-group">
-                        <label for="chooseFile"><?= $l['enter_captcha'] ?></label>
-                        <div class="row">
-                            <div class="col-sm-1">
-                                <img id="captcha-img" src="app/captcha.php">
-                            </div>
-                            <div class="col-sm-11">
-                                <input type="text" name="captcha" id="captcha" class="form-control" placeholder="Введите защитный код"
-                                       v-model="captchaInput"
-                                       @change="disabled = captchaInput.length < 5">
+                <div v-show="<?= hasFlash('showinfo') ?> &&  hidemore">
+                    <input type="submit"
+                           @click="toggleForm()"
+                           class="btn btn-primary"
+                           value="<?= $l['verify_another'] ?>">
+                </div>
+                
+                <div class="verify-form" v-show="<?= getFlash('showinfo') ? 0 : 1 ?> || showform">
+                    <h1><?= $l['header'] ?></h1>
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="chooseFile"><?= $l['choose_file'] ?></label>
+                            <input type="file" name="file" id="chooseFile" class="form-control" v-model="file">
+                        </div>
+                        <div class="form-group">
+                            <label for="chooseFile"><?= $l['choose_sign'] ?></label>
+                            <input type="file" name="sign" id="chooseSign" class="form-control" v-model="sign">
+                        </div>
+                        <div class="form-group">
+                            <label for="chooseFile"><?= $l['enter_captcha'] ?></label>
+                            <div class="row">
+                                <div class="col-sm-1">
+                                    <img id="captcha-img" src="app/captcha.php">
+                                </div>
+                                <div class="col-sm-11">
+                                    <input type="text" name="captcha" id="captcha" class="form-control" placeholder="Введите защитный код"
+                                           v-model="captchaInput"
+                                           @change="disabled = captchaInput.length < 5">
+                                </div>
                             </div>
                         </div>
-
-
-                    </div>
-                    <div class="form-group" >
-                        <input type="submit"
-                               name="check"
-                               :class="{ disabled: disabled }"
-                               @click="handleClick($event)"
-                               class="btn btn-primary"
-                               value="<?= $l['submit_button_text'] ?>"
-                    </div>
-                </form>
+                        <div class="form-group" >
+                            <input type="submit"
+                                   name="check"
+                                   :class="{ disabled: disabled }"
+                                   @click="handleClick($event)"
+                                   class="btn btn-primary"
+                                   value="<?= $l['submit_button_text'] ?>"
+                        </div>
+                    </form>
+                </div>
+                <div style="clear: both;"></div>
             </div>
+
         </div>
     </div>
 

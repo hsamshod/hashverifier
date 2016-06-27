@@ -15,25 +15,36 @@
     <div class="container" id="app">
         <div class="row">
             <div class="col-md-12">
-                <h1><?= $l['header'] ?></h1>
-                <div v-if="<?=isset($err)?>">
-                    <p class="flash bg-danger text-danger"><?= $l['cert_not_verified'] ?></p>
-                </div>
-                <div v-if="<?=!isset($err)?>">
-                    <p class="flash bg-success text-success"><?= $l['cert_verified'] ?></p>
-                    <div id="verifier-info" class="flash bg-info text-info">
-                        <b><?=$l['cert_info_title']?></b>
-                        <div>
-                            <ul class="list-group">
-                                <?php foreach ($data as $k => $v) : ?>
-                                    <li><b><?= $l['cert_info_'.$k] . '</b> '.$v; ?></li>
-                                <?php endforeach; ?>
-                            </ul>
+                <div class="info-block">
+                    <p class="flash text-red" v-show="<?= $err == VERIFY_PARAM_ERR; ?>"><?= $l['cert_link_err'] ?></p>
+                    <p class="flash text-red" v-show="<?= in_array($err, [VERIFY_KEY_ERR, VERIFY_SIGN_ERR]); ?>"><?= $l['cert_not_found'] ?></p>
+                    <p class="flash text-red" v-show="<?= $err == VERIFY_FILE_ERR; ?>"><?= $l['cert_file_err'] ?></p>
+                    <div v-if="<?=isset($code) ?>">
+                        <p class="flash text-orange" v-show="<?= $code == VERIFY_OK; ?>"><?= $l['cert_verified'] ?></p>
+                        <p class="flash text-red" v-show="<?= $code == VERIFY_ERR; ?>"><?= $l['cert_not_verified'] ?></p>
+
+                        <div id="verifier-info" class="flash text-info">
+                            <b><?=$l['cert_info_title']?>:</b>
+                            <div>
+                                <ul class="list-group">
+                                    <?php foreach (CERT_FILE_SHOW_FIELDS as $field) : ?>
+                                        <li><b><?= $l['cert_info_'.$field]; ?>:</b> <?= in_array($field, DATE_FIELDS) ? date('d.m.Y', strtotime($data[$field])) : $data[$field]; ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
+
+        <div id="slider" >
+            <iframe class="row" id="frame" src="assets/slider/index.html" style="border:1px solid #fff;margin-top:100px;" scrolling="no" border="0"></iframe>
+        </div>
+
+        <div id="footer">
+            <p> <span>&#x24B8; <?= VENDOR_TITLE ?>,</span><span> <a href="<?= VENDOR_FULL ?>" target="_blank"><?= VENDOR ?></a></span><span> <?= date('Y'); ?> г.</span></p></div>
     </div>
 </body>
 </html>

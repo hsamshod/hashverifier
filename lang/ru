@@ -8,12 +8,14 @@ cert_file_err = Файлы не соответствуют;
 captcha_err = Код с картинки не верна.;
 cert_verified = Верификация прошла успешно. Цифровая подпись верна.;
 cert_banned = 'Верификация не прошла. Сертификат заверителя заблокирован!';
+cert_link_err = 'Ссылка неверна';
 
 choose_file = Выберите подписанный файл;
 choose_sign = Выберите файл электронной подписи;
 enter_captcha = Защитный код;
 submit_button_text = Проверить;
-       
+verify_another = Проверить другой документ
+
 cert_info_title = Информация о заверителе;
 cert_info_fio = ФИО
 cert_info_position = Должность

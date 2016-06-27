@@ -15,7 +15,6 @@
 	if ($_POST['check']) {
 		setFlash('showinfo',1);
 		if (verifyCaptcha($_POST['captcha'])) {
-//			dd($s = verifyFile());
 			switch ($s = verifyFile()) {
 				case VERIFY_FILE_ERR:
 					setFlash('file_err',1);
