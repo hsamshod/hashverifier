@@ -14,6 +14,7 @@ api methods
  - verifyByParams
  - updateCert
  - updateInn
+ - deleteCert
 
 site.com/api.php?action=selectByStatus&params[:status]=1
 
@@ -34,3 +35,5 @@ site.com/api.php?action=updateTimeStamps&params[userid]=1&params[cid]=2
 site.com/api.php?action=updateCert&params[:fio]=ivan&params[:email]=em@il.com&params[:phone]=256&params[::ranc]=dean&params[:userid]=2&params[:cid]=1
 
 site.com/api.php?action=updateInn&params[:inn]=123456789&params[:userid]=2&params
+
+site.com/api.php?action=deleteCert&params[:cid]=25&params[:userid]=17826
