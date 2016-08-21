@@ -2,7 +2,6 @@
 	foreach (['config', 'utils', 'db'] as $file) {
 		include dirname(__FILE__).'/'.$file.'.php';
 	}
-
 	/**
 	 * @param string $url  	File adress to get.
 	 *
@@ -21,15 +20,21 @@
 		return file_get_contents($url, false, $context);
 	}
 
-    /**
+  	/**
      * @param $field                $_FILES array field.
      * @param bool $explode         Whether file should be returned as array/
      * @return array|bool|string    File content as string or array if uploaded, fale else.
      */
-	function getUploadedFile($field, $explode = false) {
+	function getUploadedFile($field, $explode = false, $ext = false) {
 		$f = $_FILES[$field];
+
 		if ($f['error'] == 0) {
 			$tmp_name = $f['tmp_name'];
+			
+			if ($ext && !('.'.(pathinfo($f['name'])['extension']) == $ext)) {
+				return false;
+			}
+			
 			if ($content = file_get_contents($tmp_name)) {
 				if ($explode) {
 					$content = explode("\n", $content);
@@ -160,8 +165,8 @@
 			$DS = new CDS($p, $a, $b, $n, $xG);
 
 			$hash = $strHash->GetGostHash($fileToVerify);
-			if(!$data = getUploadedFile('sign', true)) {
-                return VERIFY_SIGN_ERR;
+			if(!$data = getUploadedFile('sign', true, SIGN_EXT)) {
+                return VERIFY_FILE_ERR;
             } else {
 				list($sign, $verifier_id, $sign_date) = $data;
 				$sign = trim($sign);
@@ -451,4 +456,26 @@
 		}
 
 		return STATUS_ERR;
+	}
+
+	function getDateDiff($params = []) {
+		$sql =  'select datediff(from_unixtime(cert_ending), now()) as d '.
+			    'from cert '.
+			    'where cid = :cid and userid = :userid';
+
+		$result = CERT_DB::query($sql, $params);
+		if ($result) {
+			$data = $result->fetch(PDO::FETCH_OBJ);
+			return intval($data->d);
+			
+		} else {
+			return $result;
+		}
+	}
+
+	function deleteCert ($params = []) {
+		$sql =  'delete from cert '.
+                'where userid = :userid and cid = :cid';
+
+		CERT_DB::query($sql, $params);
 	}

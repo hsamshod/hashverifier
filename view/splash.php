@@ -39,9 +39,9 @@
             </div>
         </div>
 
-        <div id="slider" >
+        <!--div id="slider" >
             <iframe class="row" id="frame" src="assets/slider/index.html" style="border:1px solid #fff;margin-top:100px;" scrolling="no" border="0"></iframe>
-        </div>
+        </div-->
 
         <div id="footer">
             <p> <span>&#x24B8; <?= VENDOR_TITLE ?>,</span><span> <a href="<?= VENDOR_FULL ?>" target="_blank"><?= VENDOR ?></a></span><span> <?= date('Y'); ?> г.</span></p></div>

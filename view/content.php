@@ -17,11 +17,11 @@
     <div class="container" id="app">
         <div class="row">
             <div class="col-md-12">
-                <div class="info-block" v-show="<?= hasFlash('showinfo'); ?>">
+                <div class="info-block" v-show="<?= hasFlash('showinfo'); ?> && !showform">
                     <p class="flash text-red" v-show="<?= getFlash('captcha_err'); ?>"><?= $l['captcha_err'] ?></p>
                     <p class="flash text-red" v-show="<?= getFlash('sign_not_found'); ?>"><?= $l['cert_not_found'] ?></p>
                     <p class="flash text-red" v-show="<?= getFlash('file_err'); ?>"><?= $l['cert_file_err'] ?></p>
-                    <div v-show="<?= hasFlash('verified') || getFlash('not_verified'); ?>">
+                    <div v-show="<?= hasFlash('verified') || hasFlash('not_verified'); ?>">
                         <p class="flash text-orange" v-show="<?= $data['status'] != STATUS_BANNED && getFlash('verified'); ?>"><?= $l['cert_verified'] ?></p>
                         <p class="flash text-red" v-show="<?= $data['status'] == STATUS_BANNED && getFlash('verified'); ?>"><?= $l['cert_banned'] ?></p>
                         <p class="flash text-orange" v-show="<?= getFlash('verified'); ?>"><?= $l['cert_verified'] ?></p>
@@ -42,7 +42,7 @@
 
                 <div v-show="<?= hasFlash('showinfo') ?> &&  hidemore">
                     <input type="submit"
-                           @click="toggleForm()"
+                           @click="toggleForm($event)"
                            class="btn btn-primary"
                            value="<?= $l['verify_another'] ?>">
                 </div>

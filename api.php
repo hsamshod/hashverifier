@@ -11,7 +11,9 @@
         'selectStatusById',
         'verifyByParams',
         'updateCert',
-        'updateInn'
+        'updateInn',
+        'getDateDiff',
+        'deleteCert'
     ];
 
     function checkToken () {

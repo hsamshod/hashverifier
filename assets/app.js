@@ -13,7 +13,7 @@ $(document).ready(function() {
                     event.preventDefault();
                 }
             },
-            toggleForm: function () {
+            toggleForm: function (event) {
                 event.preventDefault();
                 this.showform = !this.showform;
                 this.hidemore = !this.hidemore;
