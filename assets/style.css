@@ -114,3 +114,7 @@ body{
         font-size:12pt;
     }
 }
+
+.clearfix {
+    clear: both;
+}

@@ -1,7 +1,7 @@
 <?php
     include 'app/app.php';
 
-    const API_ALLOWED_ACTIONS = [
+    const ADMIN_API_ALLOWED_ACTIONS = [
         'selectByStatus',
         'selectById',
         'updateKeys',
@@ -16,16 +16,55 @@
         'deleteCert'
     ];
 
+    const USER_API_ALLOWED_ACTIONS = [
+        'selectByStatus',
+        'selectById',
+        'updateKeys',
+        'saveFile',
+        'updateStatus',
+        'updateTimeStamps',
+        'selectStatusById',
+        'verifyByParams',
+        'updateCert',
+        'updateInn',
+        'getDateDiff',
+        'deleteCert'
+    ];
+
+    function apiDebug() {
+        if (API_DEBUG) {
+            if (empty($_GET['ts']) || empty($_GET['tkn']) || empty($_GET['t']))
+                echo json_encode('params err');
+            elseif (time() < $_GET['ts'] || (time() - $_GET['ts']) > 2) {
+                echo json_encode('timestamp err');
+            } elseif ($_GET['tkn'] === hash('SHA512', $_GET['ts']. (isAdmin() ? APP_SECRET_ADMIN_MODULE : APP_SECRET_USER_MODULE))) {
+                echo json_encode('token err: '.$_GET['tkn'] . '!=' . hash('SHA512', $_GET['ts'] . (isAdmin() ? APP_SECRET_ADMIN_MODULE : APP_SECRET_USER_MODULE)));
+            }
+        }
+        die();
+    }
+
+    function isAdmin() {
+        return $_GET['t'] == 'a';
+    }
+
+    function allowedMethods() {
+        return isAdmin() ? ADMIN_API_ALLOWED_ACTIONS : USER_API_ALLOWED_ACTIONS;
+    }
+
     function checkToken () {
-        /**
-         * @todo finish
-         */
-        return true;
+        $timestamp  = $_GET['ts'];
+        $token  = $_GET['tkn'];
+
+        $return = time() >= $timestamp  && (time() - $timestamp) < 2 && $token === hash('SHA512', $timestamp . (isAdmin() ? APP_SECRET_ADMIN_MODULE : APP_SECRET_USER_MODULE));
+        if (!$return) apiDebug();
+
+        return $return;
     }
 
     if (isset($_GET['action']) && checkToken()) {
         $action = $_GET['action'];
-        if (in_array($action, API_ALLOWED_ACTIONS)) {
+        if (in_array($action, allowedMethods())) {
             if (is_callable($action) && function_exists($action)) {
                 $params = isset($_GET['params']) ? $_GET['params'] : [];
                 $result = $action($params);

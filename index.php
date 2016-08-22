@@ -12,9 +12,9 @@
 		exit();
 	}
 
-	if ($_POST['check']) {
-		setFlash('showinfo',1);
-		if (verifyCaptcha($_POST['captcha'])) {
+    if ($_POST['check']) {
+        setFlash('showinfo',1);
+		if (verifyCaptcha($_POST['g-recaptcha-response'])) {
 			switch ($s = verifyFile()) {
 				case VERIFY_FILE_ERR:
 					setFlash('file_err',1);

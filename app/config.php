@@ -7,6 +7,12 @@
         include 'classes/'.$class_name.'.php';
     }
 
+    const CAPTCHA_SECRET            = '6LeoxCETAAAAAC1Yf0jbTKN6TJO_7Jh9df6uqF_3';
+    const APP_SECRET_ADMIN_MODULE   = 'k6yE2z5X';
+    const APP_SECRET_USER_MODULE    = 'pvS6UZRS';
+
+    const API_DEBUG = true;
+
     const SIGN_EXT     = '.sig';
 
     const VERIFY_PARAM_ERR      = -5;

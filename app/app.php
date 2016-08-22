@@ -235,9 +235,24 @@
 		}
 	}
 
-	function verifyCaptcha ($value) {
-		return strtolower($_SESSION['captcha']) === strtolower($value);
-	}
+	function verifyCaptcha ($user_response = false) {
+        $postdata = http_build_query(
+            [
+                'secret'    => CAPTCHA_SECRET,
+                'response'  => $user_response
+            ]
+        );
+
+        $opts = [
+            'http' => [
+                'method'  => 'POST',
+                'content' => $postdata
+            ]
+        ];
+        $context  = stream_context_create($opts);
+
+        return json_decode(file_get_contents('https://www.google.com/recaptcha/api/siteverify', false, $context))->success;
+    }
 
 	/**
 	 * API functions
