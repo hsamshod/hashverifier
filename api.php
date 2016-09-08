@@ -8,27 +8,15 @@
         'saveFile',
         'updateStatus',
         'updateTimeStamps',
-        'selectStatusById',
-        'verifyByParams',
         'updateCert',
         'updateInn',
-        'getDateDiff',
-        'deleteCert'
+        'deleteCert',
     ];
 
     const USER_API_ALLOWED_ACTIONS = [
-        'selectByStatus',
-        'selectById',
-        'updateKeys',
-        'saveFile',
-        'updateStatus',
-        'updateTimeStamps',
         'selectStatusById',
         'verifyByParams',
-        'updateCert',
-        'updateInn',
         'getDateDiff',
-        'deleteCert'
     ];
 
     function apiDebug() {
@@ -49,10 +37,15 @@
     }
 
     function allowedMethods() {
-        return isAdmin() ? ADMIN_API_ALLOWED_ACTIONS : USER_API_ALLOWED_ACTIONS;
+        return $_GET['token'] ? ADMIN_API_ALLOWED_ACTIONS : USER_API_ALLOWED_ACTIONS;
     }
 
     function checkToken () {
+        if (in_array($_GET['action'], ADMIN_API_ALLOWED_ACTIONS)) {
+            return $_GET['token'] == APP_SECRET_ADMIN_MODULE;
+        }
+        return true;
+
         $timestamp  = $_GET['ts'];
         $token  = $_GET['tkn'];
 
