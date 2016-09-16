@@ -3,7 +3,6 @@
 
     const ADMIN_API_ALLOWED_ACTIONS = [
         'selectByStatus',
-        'selectById',
         'updateKeys',
         'saveFile',
         'updateStatus',
@@ -14,9 +13,15 @@
     ];
 
     const USER_API_ALLOWED_ACTIONS = [
+        'selectData',
+        'selectById',
         'selectStatusById',
         'verifyByParams',
         'getDateDiff',
+    ];
+
+    const RAW_METHODS = [
+        'selectData'
     ];
 
     function apiDebug() {
@@ -61,7 +66,11 @@
             if (is_callable($action) && function_exists($action)) {
                 $params = isset($_GET['params']) ? $_GET['params'] : [];
                 $result = $action($params);
-                echo json_encode($result);
+                if (in_array($action, RAW_METHODS)) {
+                    echo $result;
+                } else {
+                    echo json_encode($result);
+                }
             }
         }
     }

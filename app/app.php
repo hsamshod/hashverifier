@@ -2,7 +2,9 @@
 	foreach (['config', 'utils', 'db'] as $file) {
 		include dirname(__FILE__).'/'.$file.'.php';
 	}
+
 	/**
+     * Get file with custom user-agent.
 	 * @param string $url  	File adress to get.
 	 *
 	 * @return string 		File content
@@ -11,7 +13,7 @@
 		$opts = [
 			'http' => [
 				'method'  =>  'GET',
-				'header'  =>  'User-agent:EduSite Site Checker v1.2',
+				'header'  =>  'User-agent:'.VENDOR_USER_AGENT,
 				'timeout' =>  20
 			]
 		];
@@ -38,6 +40,11 @@
 			if ($content = file_get_contents($tmp_name)) {
 				if ($explode) {
 					$content = explode("\n", $content);
+                    if (count($content) % 3 === 0) {
+                        return array_chunk($content, 3);
+                    } else {
+                        return false;
+                    }
 				}
 				return $content;
 			}
@@ -46,9 +53,9 @@
   	}
 
 	/**
-	 * @param string $url  	 Address of file sign of to get.
+	 * @param string $url   Address of file sign of to get.
 	 *
-	 * @return array 		 File in array form.
+	 * @return array        File in array form.
 	 */
 	function getFileSign ($url) {
 		$file_as_string = getFile($url.SIGN_EXT);
@@ -56,7 +63,11 @@
 		if ($file_as_string) {
 			$file_as_array = explode("\n", $file_as_string);
 		}
-		return $file_as_array;
+		if (count($file_as_array) % 3 === 0) {
+            return array_chunk($file_as_array, 3);
+        } else {
+            return false;
+        }
 	}
 
 	/**
@@ -85,9 +96,10 @@
 	 * Return cert file content.
 	 */
 	function getVerifierData ($verifier_id) {
-		$file_name = realpath(dirname(__FILE__).'/../'.CERT_FILE_FOLDER).'/'.str_replace('/', '_', $verifier_id).CERT_FILE_EXT;
+	    $file_name = realpath(dirname(__FILE__).'/../'.CERT_FILE_FOLDER).'/'.getFileRealPath(str_replace('/', '_', $verifier_id).CERT_FILE_EXT);
 		$data = [];
-		if (file_exists($file_name)) {
+
+        if (file_exists($file_name)) {
 			$data = parse_ini_file($file_name, false, INI_SCANNER_RAW);
 		}
 		foreach ($data as $k => $d) {
@@ -98,6 +110,26 @@
 		return $data;
 	}
 
+	function initVerify() {
+        $p = gmp_init("57896044618658097711785492504343953926634992332820282019728792003956564821041");
+        $a = gmp_init("7");
+        $b = gmp_init("0x43308876546767276905765904595650931995942111794451039583252968842033849580414");
+        $xG = [];
+        $n = gmp_init("0x8000000000000000000000000000000150FE8A1892976154C59CFC193ACCF5B3");
+
+        $strHash = new StringHash(512);
+        $DS = new CDS($p, $a, $b, $n, $xG);
+
+        return [$strHash, $DS];
+    }
+
+    function setXY($DS, $x, $y) {
+        $Q = $DS->gDecompression();
+        $Q->x = gmp_init('0x' . $x);
+        $Q->y = gmp_init('0x' . $y);
+        return $Q;
+    }
+
 	function verify () {
 		$url = urldecode($_SERVER['QUERY_STRING']);
 		if (!filter_var($url, FILTER_VALIDATE_URL)) {
@@ -107,44 +139,40 @@
 		if(!($fileToVerify = getFile($url))) {
 			return VERIFY_FILE_ERR;
 		} else {
-			$p = gmp_init("57896044618658097711785492504343953926634992332820282019728792003956564821041");
-			$a = gmp_init("7");
-			$b = gmp_init("0x43308876546767276905765904595650931995942111794451039583252968842033849580414");
-			$xG = [];
-			$n = gmp_init("0x8000000000000000000000000000000150FE8A1892976154C59CFC193ACCF5B3");
-
-			$strHash = new StringHash(512);
-			$DS = new CDS($p, $a, $b, $n, $xG);
+			list($strHash, $DS) = initVerify();
 
 			$hash = $strHash->GetGostHash($fileToVerify);
-			if(!$data = getFileSign($url)) {
+			if(!$datas = getFileSign($url)) {
                 return VERIFY_SIGN_ERR;
             } else {
-				list($sign, $verifier_id, $sign_date) = $data;
-				$sign = trim($sign);
-				$verifier_id = trim($verifier_id);
+                $return = [];
+                /* @var $datas  array of $data - hash, user_id, and smth else. */
+                foreach ($datas as $data) {
+                    list($sign, $verifier_id, $sign_date) = $data;
+                    $sign = trim($sign);
+                    $verifier_id = trim($verifier_id);
 
-				if (!($sign && $verifier_id)) {
-                	return VERIFY_SIGN_ERR;
-				}
+                    if (!($sign && $verifier_id)) {
+                        return VERIFY_SIGN_ERR;
+                    }
 
-				list($x, $y) = getKeys($verifier_id);
-				if (!($x && $y)) {
-                	return VERIFY_KEY_ERR;
-				}
-				
-				$Q = $DS->gDecompression();
-				$Q->x = gmp_init('0x' . $x);
-				$Q->y = gmp_init('0x' . $y);
+                    list($x, $y) = getKeys($verifier_id);
+                    if (!($x && $y)) {
+                        return VERIFY_KEY_ERR;
+                    }
 
-				$result = $DS->verifDS($hash, $sign, $Q);
-				if ($result === VERIFY_OK) {
-					list($user_id, $cid) = explode('/', str_replace('u', '', $verifier_id));
-					$status = selectStatusById([':userid' => $user_id, ':cid' => $cid])[0]->status;
-					$return = array_merge(['code' => VERIFY_OK, 'status' => $status, 'sign_date' => $sign_date], getVerifierData($verifier_id));
-				} else {
-					$return = array_merge(['code' => VERIFY_ERR, 'sign_date' => $sign_date], getVerifierData($verifier_id));
-				}
+                    $Q = setXY($DS, $x, $y);
+
+                    $result = $DS->verifDS($hash, $sign, $Q);
+                    if ($result === VERIFY_OK) {
+                        list($user_id, $cid) = explode('/', str_replace('u', '', $verifier_id));
+                        $status = selectStatusById([':userid' => $user_id, ':cid' => $cid])[0]->status;
+                        $return[] = array_merge(['code' => VERIFY_OK, 'status' => $status, 'sign_date' => $sign_date], getVerifierData($verifier_id));
+                    } else {
+                        $return[] = array_merge(['code' => VERIFY_ERR, 'sign_date' => $sign_date], getVerifierData($verifier_id));
+                    }
+
+                }
 
                 return $return;
             }
@@ -155,44 +183,38 @@
 		if(!($fileToVerify = getUploadedFile('file'))) {
 			return VERIFY_FILE_ERR;
 		} else {
-			$p = gmp_init("57896044618658097711785492504343953926634992332820282019728792003956564821041");
-			$a = gmp_init("7");
-			$b = gmp_init("0x43308876546767276905765904595650931995942111794451039583252968842033849580414");
-			$xG = [];
-			$n = gmp_init("0x8000000000000000000000000000000150FE8A1892976154C59CFC193ACCF5B3");
-
-			$strHash = new StringHash(512);
-			$DS = new CDS($p, $a, $b, $n, $xG);
+            list($strHash, $DS) = initVerify();
 
 			$hash = $strHash->GetGostHash($fileToVerify);
-			if(!$data = getUploadedFile('sign', true, SIGN_EXT)) {
+			if(!$datas = getUploadedFile('sign', true, SIGN_EXT)) {
                 return VERIFY_FILE_ERR;
             } else {
-				list($sign, $verifier_id, $sign_date) = $data;
-				$sign = trim($sign);
-				$verifier_id = trim($verifier_id);
+                $return = [];
+                foreach ($datas as $data) {
+                    list($sign, $verifier_id, $sign_date) = $data;
+                    $sign = trim($sign);
+                    $verifier_id = trim($verifier_id);
 
-				if (!($sign && $verifier_id)) {
-                	return VERIFY_SIGN_ERR;
-				}
+                    if (!($sign && $verifier_id)) {
+                        $return[] = ['code' => VERIFY_SIGN_ERR];
+                    } else {
+                        list($x, $y) = getKeys($verifier_id);
+                        if (!($x && $y)) {
+                            $return[] = ['code' => VERIFY_KEY_ERR];
+                        } else {
+                            $Q = setXY($DS, $x, $y);
 
-				list($x, $y) = getKeys($verifier_id);
-				if (!($x && $y)) {
-                	return VERIFY_KEY_ERR;
-				}
-				
-				$Q = $DS->gDecompression();
-				$Q->x = gmp_init('0x' . $x);
-				$Q->y = gmp_init('0x' . $y);
-
-				$result = $DS->verifDS($hash, $sign, $Q);
-				if ($result === VERIFY_OK) {
-					list($user_id, $cid) = explode('/', str_replace('u', '', $verifier_id));
-					$status = selectStatusById([':userid' => $user_id, ':cid' => $cid])[0]->status;
-					$return = array_merge(['code' => VERIFY_OK, 'status' => $status, 'sign_date' => $sign_date], getVerifierData($verifier_id));
-	            } else {
-                    $return = array_merge(['code' => VERIFY_ERR, 'sign_date' => $sign_date], getVerifierData($verifier_id));
-	            }
+                            $result = $DS->verifDS($hash, $sign, $Q);
+                            if ($result === VERIFY_OK) {
+                                list($user_id, $cid) = explode('/', str_replace('u', '', $verifier_id));
+                                $status = selectStatusById([':userid' => $user_id, ':cid' => $cid])[0]->status;
+                                $return[] = array_merge(['code' => VERIFY_OK, 'status' => $status, 'sign_date' => $sign_date], getVerifierData($verifier_id));
+                            } else {
+                                $return[] = array_merge(['code' => VERIFY_ERR, 'sign_date' => $sign_date], getVerifierData($verifier_id));
+                            }
+                        }
+                    }
+                }
 
                 return $return;
             }
@@ -205,19 +227,11 @@
 			$sign = $params['sign'];
 			$verifier_id = 'u' . $params['userid'] . '/' . $params['cid'];
 
-			$p = gmp_init("57896044618658097711785492504343953926634992332820282019728792003956564821041");
-			$a = gmp_init("7");
-			$b = gmp_init("0x43308876546767276905765904595650931995942111794451039583252968842033849580414");
-			$xG = [];
-			$n = gmp_init("0x8000000000000000000000000000000150FE8A1892976154C59CFC193ACCF5B3");
-
-			$DS = new CDS($p, $a, $b, $n, $xG);
+            list(, $DS) = initVerify();
 			list($x, $y) = getKeys($verifier_id);
 
 			if ($x && $y) {
-				$Q = $DS->gDecompression();
-				$Q->x = gmp_init('0x' . $x);
-				$Q->y = gmp_init('0x' . $y);
+                $Q = setXY($DS, $x, $y);
 				return $DS->verifDS(strtolower($hash), $sign, $Q) === VERIFY_OK;
 			} else {
 				return 0;
@@ -235,6 +249,9 @@
 		}
 	}
 
+	/**
+     * Google recaptcha verification.
+     */
 	function verifyCaptcha ($user_response = false) {
         $postdata = http_build_query(
             [
@@ -406,6 +423,12 @@
 		}
 	}
 
+	function selectData($params = []) {
+        if ($data = selectById($params)) {
+            return $data[0]->edu_eds_fio.'%'.$data[0]->edu_name;
+        } else return false;
+    }
+
 	function selectStatusById ($params = []) {
 		$sql = 	'select c.status '.
 				'from cert c '.
@@ -452,27 +475,6 @@
 		return CERT_DB::query($sql, $params) ? STATUS_OK : STATUS_ERR;
 	}
 
-	function saveFile($params = []) {
-		if (isset($params['file_name'])) {
-			$file_name = str_replace('/', '_', $params['file_name']) . CERT_FILE_EXT;
-
-			unset($params['file_name']);
-			$content_as_array = [];
-			foreach ($params as $key => $val) {
-				if (in_array($key, CERT_FILE_ALLOWED_DATA)) {
-					$content_as_array[] = $key . ' = '. $val;
-				}
-			}
-
-			return file_put_contents(
-				CERT_FILE_FOLDER.'/'.$file_name,
-				implode("\n", $content_as_array)
-			) ? STATUS_OK : STATUS_ERR;
-		}
-
-		return STATUS_ERR;
-	}
-
 	function getDateDiff($params = []) {
 		$sql =  'select datediff(from_unixtime(cert_ending), now()) as d '.
 			    'from cert '.
@@ -487,6 +489,24 @@
 			return $result;
 		}
 	}
+
+    function saveFile($params = []) {
+        if (isset($params['file_name'])) {
+            $file_name = str_replace('/', '_', $params['file_name']) . CERT_FILE_EXT;
+
+            unset($params['file_name']);
+            $content_as_array = [];
+            foreach ($params as $key => $val) {
+                if (in_array($key, CERT_FILE_ALLOWED_DATA)) {
+                    $content_as_array[] = $key . ' = '. $val;
+                }
+            }
+
+            return store($file_name, implode("\n", $content_as_array), CERT_FILE_FOLDER) ? STATUS_OK : STATUS_ERR;
+        }
+
+        return STATUS_ERR;
+    }
 
 	function deleteCert ($params = []) {
 		$sql =  'delete from cert '.

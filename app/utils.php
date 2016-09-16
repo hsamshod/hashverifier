@@ -102,3 +102,41 @@
         }
         die();
     }
+
+    /**
+     * Store file in multilevel directory
+     * with creating directory if not exists.
+     */
+    function store($fileName, $data, $dirName = '.') {
+        $realPath = '';
+
+        if (($maxLevel = strlen(explode('.', $fileName)[0])) > 2) {
+            $i = 0;
+            while ($i < $maxLevel && $i < DIR_MAX_LEVEL) {
+                $dirName .= '/'.substr($fileName, $i, 1);
+                if (!is_dir($dirName)) {
+                    mkdir($dirName);
+                }
+                $i++;
+            }
+        }
+
+        $realPath = $dirName.'/'.$fileName;
+
+        $file = new SplFileObject($realPath, 'w');
+        return $file->fwrite($data);
+    }
+
+    function getFileRealPath($fileName, $dirName = '.') {
+        if (($maxLevel = strlen(explode('.', $fileName)[0])) > 2) {
+            $i = 0;
+            while ($i < $maxLevel && $i < DIR_MAX_LEVEL) {
+                $dirName .= '/'.substr($fileName, $i, 1);
+                $i++;
+            }
+        }
+
+        $realPath = $dirName.'/'.$fileName;
+
+        return $realPath;
+    }

@@ -2,23 +2,19 @@ $(document).ready ->
     window.vm = new Vue
         el: '#app',
 
-        data:
-            disabled: true
-            captchaInput: ''
-            showform: false
-            hidemore: true
-
+        data: ->
+            _.extend data,
+                showform: not(data['verify_captcha'] or data['verify_result'].code)
+                disabled: true
         methods:
             verifyCaptcha: ->
-                console.log 'verify'
                 this.disabled = false if grecaptcha.getResponse()
 
             handleClick: (event) ->
                 event.preventDefault() if this.disabled
 
-            toggleForm: ->
-                this.showform = !this.showform
-                this.hidemore = !this.hidemore
+            dateFormat: (date) ->
+                (new Date(date)).toLocaleDateString 'RU-ru'
 
     window.verifyCaptcha = ->
         vm.verifyCaptcha()

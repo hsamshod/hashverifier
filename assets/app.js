@@ -3,15 +3,14 @@
   $(document).ready(function() {
     window.vm = new Vue({
       el: '#app',
-      data: {
-        disabled: true,
-        captchaInput: '',
-        showform: false,
-        hidemore: true
+      data: function() {
+        return _.extend(data, {
+          showform: !(data['verify_captcha'] || data['verify_result'].code),
+          disabled: true
+        });
       },
       methods: {
         verifyCaptcha: function() {
-          console.log('verify');
           if (grecaptcha.getResponse()) {
             return this.disabled = false;
           }
@@ -21,9 +20,8 @@
             return event.preventDefault();
           }
         },
-        toggleForm: function() {
-          this.showform = !this.showform;
-          return this.hidemore = !this.hidemore;
+        dateFormat: function(date) {
+          return (new Date(date)).toLocaleDateString('RU-ru');
         }
       }
     });
