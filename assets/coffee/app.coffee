@@ -4,7 +4,7 @@ $(document).ready ->
 
         data: ->
             _.extend data,
-                showform: not(data['verify_captcha'] or data['verify_result'].code)
+                showform: not(data['verify_captcha'] or data['verify_result'].length)
                 disabled: true
         methods:
             verifyCaptcha: ->

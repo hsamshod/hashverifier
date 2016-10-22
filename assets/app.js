@@ -5,7 +5,7 @@
       el: '#app',
       data: function() {
         return _.extend(data, {
-          showform: !(data['verify_captcha'] || data['verify_result'].code),
+          showform: !(data['verify_captcha'] || data['verify_result'].length),
           disabled: true
         });
       },

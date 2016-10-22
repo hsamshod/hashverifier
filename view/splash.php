@@ -27,18 +27,15 @@
     };
 
     data['verify_captcha'] = <?= json_encode(getFlash('verify_captcha')) ?>;
-    data['verify_result']  = <?= json_encode(getFlash('verify_result')) ?>;
+    data['verify_result']  = <?= json_encode(is_array($d = getFlash('verify_result')) ? $d : ['code' => $d]); ?>;
 </script>
 <div class='container' id='app'>
     <div class='row'>
         <div class='col-md-12'>
-            <div class='info-block' v-show='verify_captcha && verify_captcha.error && !showform'>
-                <p class='flash text-red'><?= $l['captcha_err'] ?></p>
-            </div>
-            <div class='info-block' v-show='verify_result.length' v-for='result in verify_result'>
-                <p class='flash text-red' v-show='result.code == VERIFY_SIGN_ERR'><?= $l['cert_not_found'] ?></p>
+            <div class='info-block' v-show='!showform && verify_result.length' v-for='result in verify_result'>
+                <p class='flash text-red' v-show='result.code == VERIFY_SIGN_ERR || result.code == VERIFY_KEY_ERR '><?= $l['cert_not_found'] ?></p>
                 <p class='flash text-red' v-show='result.code == VERIFY_FILE_ERR'><?= $l['cert_file_err'] ?></p>
-                <div v-show='result.code != VERIFY_KEY_ERR || result.code != VERIFY_PARAM_ERR'>
+                <div v-show='result.code == VERIFY_ERR || result.code == VERIFY_OK'>
                     <p class='flash text-red' v-show='result.status == STATUS_BANNED'><?= $l['cert_banned'] ?></p>
                     <p class='flash text-red' v-show='result.code == VERIFY_ERR'><?= $l['cert_not_verified'] ?></p>
                     <p class='flash text-orange' v-show='result.status != STATUS_BANNED && result.code == VERIFY_OK'><?= $l['cert_verified'] ?></p>
@@ -47,8 +44,8 @@
                         <div>
                             <ul class="list-group">
                                 <?php foreach (CERT_FILE_SHOW_FIELDS as $field) : ?>
-                                    <li><b><?= $l['cert_info_'.$field]; ?>:</b> {{ result.<?=$field?> }}
-                                        <?= in_array($field, DATE_FIELDS) ? date('d.m.Y', strtotime($data[$field])) : $data[$field]; ?></li>
+                                    <li><b><?= $l['cert_info_'.$field]; ?>:</b>
+                                        <?= in_array($field, DATE_FIELDS) ? '{{ dateFormat(result.'.$field.') }}' : '{{ result.'.$field.' }}' ?></li>
                                 <?php endforeach; ?>
                             </ul>
                         </div>
@@ -57,13 +54,9 @@
             </div>
             <div class='clearfix'></div>
         </div>
-
     </div>
 </div>
 
-<div id='slider'>
-    <iframe class='row' id='frame' src='assets/slider/index.html' style='border:1px solid #fff;margin-top:100px;' scrolling='no' border='0'></iframe>
-</div>
 <div id='footer'>
     <p> <span>&#x24B8; <?= VENDOR_TITLE ?>,</span><span> <a href="<?= VENDOR_FULL ?>" target="_blank"><?= VENDOR ?></a></span><span> <?= date('Y'); ?> г.</span></p></div>
 </body>

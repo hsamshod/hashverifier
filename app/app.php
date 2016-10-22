@@ -133,17 +133,15 @@
 	function verify () {
 		$url = urldecode($_SERVER['QUERY_STRING']);
 		if (!filter_var($url, FILTER_VALIDATE_URL)) {
-			return VERIFY_PARAM_ERR;
+			return ['code' => VERIFY_PARAM_ERR];
 		}
-		
 		if(!($fileToVerify = getFile($url))) {
-			return VERIFY_FILE_ERR;
+            return ['code' => VERIFY_FILE_ERR];
 		} else {
 			list($strHash, $DS) = initVerify();
-
-			$hash = $strHash->GetGostHash($fileToVerify);
-			if(!$datas = getFileSign($url)) {
-                return VERIFY_SIGN_ERR;
+            $hash = $strHash->GetGostHash($fileToVerify);
+            if(!$datas = getFileSign($url)) {
+                return ['code' => VERIFY_SIGN_ERR];
             } else {
                 $return = [];
                 /* @var $datas  array of $data - hash, user_id, and smth else. */
@@ -153,27 +151,25 @@
                     $verifier_id = trim($verifier_id);
 
                     if (!($sign && $verifier_id)) {
-                        return VERIFY_SIGN_ERR;
-                    }
-
-                    list($x, $y) = getKeys($verifier_id);
-                    if (!($x && $y)) {
-                        return VERIFY_KEY_ERR;
-                    }
-
-                    $Q = setXY($DS, $x, $y);
-
-                    $result = $DS->verifDS($hash, $sign, $Q);
-                    if ($result === VERIFY_OK) {
-                        list($user_id, $cid) = explode('/', str_replace('u', '', $verifier_id));
-                        $status = selectStatusById([':userid' => $user_id, ':cid' => $cid])[0]->status;
-                        $return[] = array_merge(['code' => VERIFY_OK, 'status' => $status, 'sign_date' => $sign_date], getVerifierData($verifier_id));
+                        $return[] = ['code' => VERIFY_SIGN_ERR];
                     } else {
-                        $return[] = array_merge(['code' => VERIFY_ERR, 'sign_date' => $sign_date], getVerifierData($verifier_id));
+                        list($x, $y) = getKeys($verifier_id);
+                        if (!($x && $y)) {
+                            $return[] = ['code' => VERIFY_KEY_ERR];
+                        } else {
+                            $Q = setXY($DS, $x, $y);
+
+                            $result = $DS->verifDS($hash, $sign, $Q);
+                            if ($result === VERIFY_OK) {
+                                list($user_id, $cid) = explode('/', str_replace('u', '', $verifier_id));
+                                $status = selectStatusById([':userid' => $user_id, ':cid' => $cid])[0]->status;
+                                $return[] = array_merge(['code' => VERIFY_OK, 'status' => $status, 'sign_date' => $sign_date], getVerifierData($verifier_id));
+                            } else {
+                                $return[] = array_merge(['code' => VERIFY_ERR, 'sign_date' => $sign_date], getVerifierData($verifier_id));
+                            }
+                        }
                     }
-
                 }
-
                 return $return;
             }
 		}

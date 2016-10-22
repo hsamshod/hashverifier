@@ -1,13 +1,23 @@
 <?php
+    error_reporting(E_ALL);
+    error_reporting(E_ALL);
     session_start();
     ini_set('max_execution_time', 300);
     ini_set('default_charset', 'UTF-8');
+
+    const DIR_MAX_LEVEL = 5;
+
+    const HOST                  = 'http://sig.edusite.ru';
+    const VENDOR                = 'www.e-publish.ru';
+    const VENDOR_FULL           = 'http://www.e-publish.ru';
+    const VENDOR_TITLE          = 'ЗАО «Е-Паблиш»';
+    const VENDOR_USER_AGENT     = 'EduSite Site Checker v1.2';
 
     function __autoload($class_name) {
         include 'classes/'.$class_name.'.php';
     }
 
-    const CAPTCHA_SECRET            = '6LeoxCETAAAAAC1Yf0jbTKN6TJO_7Jh9df6uqF_3';
+    const CAPTCHA_SECRET     = '6LeoxCETAAAAAC1Yf0jbTKN6TJO_7Jh9df6uqF_3';
     const APP_SECRET_ADMIN_MODULE   = 'affix';
     const APP_SECRET_USER_MODULE    = 'pvS6UZRS';
 
@@ -29,17 +39,17 @@
 
     const DB_ERR_FOLDER = 'err';
 
-    const CERT_DB_HOST   = 'localhost';
-    const CERT_DB_USER   = 'root';
-    const CERT_DB_PASS   = '';
+    const CERT_DB_HOST   = '172.16.1.2';
+    const CERT_DB_USER   = 'apache';
+    const CERT_DB_PASS   = 'aa';
     const CERT_DB_NAME   = 'edusite';
 
     const CERT_DB_KEYS_TABLE  = 'cert';
-    const CERT_DB_CERT_TABLE  = 'certificate'; 
-    const CERT_ALLOWED_STATUSES  = [1,2,3,4,5,6]; // min 1 elem
+    const CERT_DB_CERT_TABLE  = 'certificate';
+    const CERT_ALLOWED_STATUSES = [1,2,3,4,5,6]; // min 1 elem
 
-    const CERT_FILE_FOLDER       = 'cert';
-    const CERT_FILE_EXT          = '.txt';
+    const CERT_FILE_FOLDER = 'cert';
+    const CERT_FILE_EXT = '.txt';
     const CERT_FILE_ALLOWED_DATA = [
         'cert_number', 'name', 'address',
         'date_begin', 'date_end',
@@ -47,32 +57,31 @@
         'phone', 'inn', 'key1', 'key2',
         'name_center', 'address_center'
     ];
-    
+
     const CERT_FILE_SHOW_FIELDS = [
         'name', 'edu_rank', 'edu_name',
         'inn', 'date_begin', 'sign_date', 'address',
         'name_center', 'address_center'
-    ];
+    ];  
 
     const DATE_FIELDS = [
         'date_begin'
     ];
-
 
     const CERT_APPEND_DATA = [
         'issued'         => 'Наименование удостоверяющего центра, который выдал сертификат ключа проверки электронной подписи: ЗАО «Е-Паблиш»',
         'issuer_address' =>'Место нахождения удостоверяющего центра:  юр. Адрес ЗАО Е-Паблиш'
     ];
 
-    const ADDR_DB_HOST   = 'localhost';
-    const ADDR_DB_USER   = 'root';
-    const ADDR_DB_PASS   = '';
-    const ADDR_DB_NAME   = 'edusite';
+    const ADDR_DB_HOST   = '172.16.1.5';
+    const ADDR_DB_USER   = 'rusobr';
+    const ADDR_DB_PASS   = 'FAalc8Tydn';
+    const ADDR_DB_NAME   = 'rusobr';
 
     const ADDR_DB_REGIONS_TABLE = 'regions';
     const ADDR_DB_POST_TYPE_TABLE = 'postindex_type';
 
-    $A = [
+        $A = [
         gmp_init('0x8e20faa72ba0b470'), gmp_init('0x47107ddd9b505a38'), gmp_init('0xad08b0e0c3282d1c'), gmp_init('0xd8045870ef14980e'),
         gmp_init('0x6c022c38f90a4c07'), gmp_init('0x3601161cf205268d'), gmp_init('0x1b8e0b0e798c13c8'), gmp_init('0x83478b07b2468764'),
         gmp_init('0xa011d380818e8f40'), gmp_init('0x5086e740ce47c920'), gmp_init('0x2843fd2067adea10'), gmp_init('0x14aff010bdd87508'),
